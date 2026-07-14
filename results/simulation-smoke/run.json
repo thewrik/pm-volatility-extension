@@ -1,7 +1,0 @@
-{
-  "replications": 3,
-  "n_train": 5000,
-  "n_test": 2500,
-  "true_k": 0.7,
-  "all_coherent": true
-}
