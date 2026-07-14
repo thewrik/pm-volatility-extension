@@ -239,6 +239,7 @@
       .twoColumn,
       .modelBlock,
       .chartSection,
+      .logSection,
       .linksPanel {
         display: grid;
         grid-template-columns: minmax(260px, 0.85fr) minmax(0, 1.15fr);
@@ -325,6 +326,18 @@
         box-shadow: 0 22px 60px rgba(21, 32, 29, 0.1);
       }
 
+      .logSection {
+        border-top: 1px solid var(--line);
+      }
+
+      .textLink {
+        display: inline-flex;
+        margin-top: 8px;
+        border-bottom: 2px solid var(--clay);
+        color: var(--ink);
+        font-weight: 800;
+      }
+
       .linksPanel {
         align-items: stretch;
         padding-top: 24px;
@@ -371,6 +384,7 @@
         .twoColumn,
         .modelBlock,
         .chartSection,
+        .logSection,
         .linksPanel {
           grid-template-columns: 1fr;
         }
@@ -554,6 +568,28 @@
         />
       </section>
 
+      <section class="section logSection" aria-label="Agent activity log">
+        <div>
+          <p class="kicker">Agent log</p>
+          <h2>A public parsing trail, not private chain-of-thought.</h2>
+        </div>
+        <div class="prose">
+          <p>
+            The repository now includes a sanitized activity log that records how
+            the artifact was framed, where claims were narrowed, what verification
+            was performed, and what independent checks remain.
+          </p>
+          <p>
+            It deliberately does not expose private chain-of-thought. It is meant
+            to give readers a useful audit trail while keeping the public record
+            focused on decisions, evidence, caveats, and reproducible work.
+          </p>
+          <a class="textLink" href="https://github.com/thewrik/pm-volatility-extension/blob/main/docs/agent-log.md">
+            Read the agent activity log
+          </a>
+        </div>
+      </section>
+
       <section class="section linksPanel" aria-label="Project links">
         <div>
           <p class="kicker">Read next</p>
@@ -575,6 +611,10 @@
           <a href="https://github.com/thewrik/pm-volatility-extension/blob/main/docs/novelty.md">
             <span>Novelty notes</span>
             <strong>Closest prior work screened and remaining verification risk</strong>
+          </a>
+          <a href="https://github.com/thewrik/pm-volatility-extension/blob/main/docs/agent-log.md">
+            <span>Agent log</span>
+            <strong>Public process record for framing, decisions, and verification</strong>
           </a>
         </div>
       </section>
