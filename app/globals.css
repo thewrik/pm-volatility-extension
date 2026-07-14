@@ -228,6 +228,7 @@ main {
 .twoColumn,
 .modelBlock,
 .chartSection,
+.logSection,
 .linksPanel {
   display: grid;
   grid-template-columns: minmax(260px, 0.85fr) minmax(0, 1.15fr);
@@ -319,6 +320,18 @@ main {
   box-shadow: 0 22px 60px rgba(21, 32, 29, 0.1);
 }
 
+.logSection {
+  border-top: 1px solid var(--line);
+}
+
+.textLink {
+  display: inline-flex;
+  margin-top: 8px;
+  border-bottom: 2px solid var(--clay);
+  color: var(--ink);
+  font-weight: 800;
+}
+
 .linksPanel {
   align-items: stretch;
   padding-top: 24px;
@@ -365,6 +378,7 @@ main {
   .twoColumn,
   .modelBlock,
   .chartSection,
+  .logSection,
   .linksPanel {
     grid-template-columns: 1fr;
   }

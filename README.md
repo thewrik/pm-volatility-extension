@@ -58,7 +58,9 @@ contracts across 50 months.
 
 Claims and rejected hypotheses are tracked in [`docs/claims.md`](docs/claims.md);
 protocol amendments and threats to validity are explicit in
-[`docs/audit.md`](docs/audit.md). The manuscript treats the negative boundary as
+[`docs/audit.md`](docs/audit.md). A public sanitized process record is available
+in [`docs/agent-log.md`](docs/agent-log.md); it is an activity log, not a private
+chain-of-thought transcript. The manuscript treats the negative boundary as
 evidence that coherence is necessary but not sufficient without a richer jump
 or scheduled-event component.
 

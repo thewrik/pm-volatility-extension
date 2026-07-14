@@ -151,6 +151,28 @@ export default function Home() {
         />
       </section>
 
+      <section className="section logSection" aria-label="Agent activity log">
+        <div>
+          <p className="kicker">Agent log</p>
+          <h2>A public parsing trail, not private chain-of-thought.</h2>
+        </div>
+        <div className="prose">
+          <p>
+            The repository now includes a sanitized activity log that records how
+            the artifact was framed, where claims were narrowed, what verification
+            was performed, and what independent checks remain.
+          </p>
+          <p>
+            It deliberately does not expose private chain-of-thought. It is meant
+            to give readers a useful audit trail while keeping the public record
+            focused on decisions, evidence, caveats, and reproducible work.
+          </p>
+          <a className="textLink" href={repoUrl + "/blob/main/docs/agent-log.md"}>
+            Read the agent activity log
+          </a>
+        </div>
+      </section>
+
       <section className="section linksPanel" aria-label="Project links">
         <div>
           <p className="kicker">Read next</p>
@@ -172,6 +194,10 @@ export default function Home() {
           <a href={repoUrl + "/blob/main/docs/novelty.md"}>
             <span>Novelty notes</span>
             <strong>Closest prior work screened and remaining verification risk</strong>
+          </a>
+          <a href={repoUrl + "/blob/main/docs/agent-log.md"}>
+            <span>Agent log</span>
+            <strong>Public process record for framing, decisions, and verification</strong>
           </a>
         </div>
       </section>
