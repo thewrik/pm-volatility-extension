@@ -10,6 +10,9 @@ This is a one-shotting exercise for **5.6-Sol**. The repository is intended as
 an auditable research artifact, but the accuracy, correctness, and novelty of
 model-generated outputs remain subject to independent verification.
 
+A layperson-friendly public explainer is deployed at
+https://thewrik.github.io/pm-volatility-extension/.
+
 The original DR-AS model forecasts the scale of a move conditional on an active
 price update. MHB instead forecasts the entire next-period distribution,
 including the atom at no change. It enforces a restriction that follows from
