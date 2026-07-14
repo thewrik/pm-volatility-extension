@@ -11,19 +11,42 @@ import pandas as pd
 
 from .evaluation import (
     clipped_normal_cell_probability,
+    clipped_normal_randomized_cell_pit,
     hurdle_beta_cell_probability,
     hurdle_beta_interval,
+    hurdle_beta_randomized_cell_pit,
     summarize_forecast,
 )
 from .fit import fit_hazard, fit_order_flow_k
-from .model import clock_release, dr_as_linear_variance, normal_reference_interval
+from .model import (
+    clock_release,
+    dr_as_linear_variance,
+    interval_score,
+    normal_reference_interval,
+)
+
+MODEL_NAMES = {
+    "dr_normal": "DR normal",
+    "dras_normal": "DR-AS normal",
+    "beta_no_hurdle": "Beta, no hurdle",
+    "hurdle_posthoc": "Hurdle beta, post-hoc coherence",
+    "mhb": "MHB",
+}
 
 
-def _prepare(frame: pd.DataFrame, max_spread: float) -> pd.DataFrame:
+def _prepare(
+    frame: pd.DataFrame,
+    max_spread: float,
+    minimum_contract_forecasts: int,
+) -> pd.DataFrame:
     valid = frame["valid_forecast"]
     if valid.dtype != bool:
         valid = valid.astype(str).str.lower().eq("true")
-    result = frame.loc[valid & (frame["spread"] <= max_spread)].copy()
+    valid_counts = frame.loc[valid].groupby("ticker", sort=False).size()
+    eligible = valid_counts.loc[valid_counts >= minimum_contract_forecasts].index
+    result = frame.loc[
+        valid & frame["ticker"].isin(eligible) & (frame["spread"] <= max_spread)
+    ].copy()
     for column in ("timestamp", "next_timestamp", "deadline"):
         result[column] = pd.to_datetime(result[column], utc=True)
     result["updated"] = result["updated"].astype(int)
@@ -59,8 +82,10 @@ def expanding_backtest(
     min_training_rows: int = 1000,
     tick_size: float = 0.005,
     level: float = 0.95,
+    estimation_weighting: str = "volume",
+    minimum_contract_forecasts: int = 48,
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
-    data = _prepare(panel, max_spread)
+    data = _prepare(panel, max_spread, minimum_contract_forecasts)
     months = sorted(data["forecast_month"].unique())
     records: list[dict[str, object]] = []
     predictions: list[pd.DataFrame] = []
@@ -74,10 +99,16 @@ def expanding_backtest(
         # Match the target paper for the normal DR-AS baseline: active-update
         # QMLE. MHB instead fits the unconditional variance budget on all hours.
         k_original = fit_order_flow_k(
-            train, finite_clock=False, active_only=True, weighting="equal"
+            train,
+            finite_clock=False,
+            active_only=True,
+            weighting=estimation_weighting,
         )
         k_mhb = fit_order_flow_k(
-            train, finite_clock=True, active_only=False, weighting="equal"
+            train,
+            finite_clock=True,
+            active_only=False,
+            weighting=estimation_weighting,
         )
         train_release = clock_release(
             train["price"],
@@ -86,8 +117,18 @@ def expanding_backtest(
             train["volume"],
             k=k_mhb,
         )
-        constrained = fit_hazard(train, train_release, constrained=True)
-        unconstrained = fit_hazard(train, train_release, constrained=False)
+        constrained = fit_hazard(
+            train,
+            train_release,
+            constrained=True,
+            weighting=estimation_weighting,
+        )
+        unconstrained = fit_hazard(
+            train,
+            train_release,
+            constrained=False,
+            weighting=estimation_weighting,
+        )
 
         p = test["price"].to_numpy(float)
         y = test["price_next"].to_numpy(float)
@@ -100,7 +141,7 @@ def expanding_backtest(
         )
         q_mhb = constrained.predict(test, test_release)
         q_raw = unconstrained.predict(test, test_release)
-        q_posthoc = np.maximum(q_raw, test_release + 1e-10)
+        q_posthoc = np.clip(np.maximum(q_raw, test_release), 0.0, 1.0)
 
         dr_variance = dr_as_linear_variance(p, test["time_to_resolution"])
         dras_variance = dr_as_linear_variance(
@@ -111,68 +152,93 @@ def expanding_backtest(
             k=k_original,
         )
         normal_models = {
-            "DR normal": dr_variance,
-            "DR-AS normal": dras_variance,
+            "dr_normal": dr_variance,
+            "dras_normal": dras_variance,
         }
         beta_models = {
-            "Beta, no hurdle": np.ones_like(test_release),
-            "Hurdle beta, post-hoc coherence": q_posthoc,
-            "MHB": q_mhb,
+            "beta_no_hurdle": np.ones_like(test_release),
+            "hurdle_posthoc": q_posthoc,
+            "mhb": q_mhb,
         }
         weight_sets = {
             "equal": np.ones(len(test)),
             "volume": np.maximum(test["volume"].to_numpy(float), 0.0),
         }
 
-        for name, variance in normal_models.items():
-            probability = clipped_normal_cell_probability(
-                p, y, variance, tick_size=tick_size
-            )
-            lower, upper = normal_reference_interval(p, variance)
-            for weighting, weights in weight_sets.items():
-                summary = summarize_forecast(
-                    probability, lower, upper, y, weights, alpha=1.0 - level
-                )
-                records.append(
-                    {
-                        "month": month,
-                        "model": name,
-                        "weighting": weighting,
-                        "n": len(test),
-                        "k_original": k_original,
-                        "k_mhb": k_mhb,
-                        **summary,
-                    }
-                )
-
-        for name, hazard in beta_models.items():
-            probability, lower, upper = _model_scores(
-                test, test_release, hazard, tick_size=tick_size, level=level
-            )
-            for weighting, weights in weight_sets.items():
-                summary = summarize_forecast(
-                    probability, lower, upper, y, weights, alpha=1.0 - level
-                )
-                records.append(
-                    {
-                        "month": month,
-                        "model": name,
-                        "weighting": weighting,
-                        "n": len(test),
-                        "k_original": k_original,
-                        "k_mhb": k_mhb,
-                        **summary,
-                    }
-                )
-
         prediction = test[
-            ["ticker", "series", "category", "timestamp", "price", "price_next", "updated", "volume"]
+            [
+                "ticker",
+                "series",
+                "category",
+                "timestamp",
+                "price",
+                "price_next",
+                "updated",
+                "volume",
+            ]
         ].copy()
         prediction["month"] = month
         prediction["release"] = test_release
         prediction["q_mhb"] = q_mhb
         prediction["q_unconstrained"] = q_raw
+        prediction["q_posthoc"] = q_posthoc
         prediction["unconstrained_violation"] = q_raw < test_release
+        prediction["variance_dr_normal"] = dr_variance
+        prediction["variance_dras_normal"] = dras_variance
+
+        for slug, variance in normal_models.items():
+            probability = clipped_normal_cell_probability(
+                p, y, variance, tick_size=tick_size
+            )
+            lower, upper = normal_reference_interval(p, variance)
+            prediction[f"nll_{slug}"] = -np.log(probability)
+            prediction[f"is_{slug}"] = interval_score(
+                lower, upper, y, alpha=1.0 - level
+            )
+            for weighting, weights in weight_sets.items():
+                summary = summarize_forecast(
+                    probability, lower, upper, y, weights, alpha=1.0 - level
+                )
+                records.append(
+                    {
+                        "month": month,
+                        "model": MODEL_NAMES[slug],
+                        "model_slug": slug,
+                        "weighting": weighting,
+                        "n": len(test),
+                        "weight_sum": float(weights.sum()),
+                        "k_original": k_original,
+                        "k_mhb": k_mhb,
+                        **summary,
+                    }
+                )
+
+        for slug, hazard in beta_models.items():
+            probability, lower, upper = _model_scores(
+                test, test_release, hazard, tick_size=tick_size, level=level
+            )
+            prediction[f"nll_{slug}"] = -np.log(probability)
+            prediction[f"is_{slug}"] = interval_score(
+                lower, upper, y, alpha=1.0 - level
+            )
+            for weighting, weights in weight_sets.items():
+                summary = summarize_forecast(
+                    probability, lower, upper, y, weights, alpha=1.0 - level
+                )
+                records.append(
+                    {
+                        "month": month,
+                        "model": MODEL_NAMES[slug],
+                        "model_slug": slug,
+                        "weighting": weighting,
+                        "n": len(test),
+                        "weight_sum": float(weights.sum()),
+                        "k_original": k_original,
+                        "k_mhb": k_mhb,
+                        **summary,
+                    }
+                )
+
         predictions.append(prediction)
         print(
             f"{month}: train={len(train):,} test={len(test):,} "
@@ -186,13 +252,268 @@ def expanding_backtest(
     return pd.DataFrame(records), pd.concat(predictions, ignore_index=True)
 
 
+def calibration_table(
+    predictions: pd.DataFrame,
+    *,
+    levels: tuple[float, ...] = (0.50, 0.80, 0.95),
+) -> pd.DataFrame:
+    """Pooled interval calibration at pre-specified nominal levels."""
+
+    p = predictions["price"].to_numpy(float)
+    y = predictions["price_next"].to_numpy(float)
+    release = predictions["release"].to_numpy(float)
+    hazards = {
+        "beta_no_hurdle": np.ones(len(predictions)),
+        "hurdle_posthoc": predictions["q_posthoc"].to_numpy(float),
+        "mhb": predictions["q_mhb"].to_numpy(float),
+    }
+    variances = {
+        "dr_normal": predictions["variance_dr_normal"].to_numpy(float),
+        "dras_normal": predictions["variance_dras_normal"].to_numpy(float),
+    }
+    weights_by_name = {
+        "equal": np.ones(len(predictions)),
+        "volume": np.maximum(predictions["volume"].to_numpy(float), 0.0),
+    }
+    rows: list[dict[str, object]] = []
+    from scipy.stats import norm
+
+    for level in levels:
+        intervals: dict[str, tuple[np.ndarray, np.ndarray]] = {}
+        for slug, variance in variances.items():
+            intervals[slug] = normal_reference_interval(
+                p, variance, z=float(norm.ppf((1.0 + level) / 2.0))
+            )
+        for slug, hazard in hazards.items():
+            intervals[slug] = hurdle_beta_interval(p, release, hazard, level=level)
+
+        for slug, (lower, upper) in intervals.items():
+            scores = interval_score(lower, upper, y, alpha=1.0 - level)
+            covered = (lower <= y) & (y <= upper)
+            for weighting, weights in weights_by_name.items():
+                total = weights.sum()
+                if total <= 0:
+                    continue
+                rows.append(
+                    {
+                        "model": MODEL_NAMES[slug],
+                        "model_slug": slug,
+                        "weighting": weighting,
+                        "level": level,
+                        "coverage": float(np.sum(weights * covered) / total),
+                        "interval_score": float(np.sum(weights * scores) / total),
+                        "width": float(np.sum(weights * (upper - lower)) / total),
+                    }
+                )
+    return pd.DataFrame(rows)
+
+
+def pit_table(predictions: pd.DataFrame, *, tick_size: float, seed: int = 41731) -> pd.DataFrame:
+    """Randomized cell-PIT diagnostics without invalid iid p-values."""
+
+    rng = np.random.default_rng(seed)
+    uniform = rng.random(len(predictions))
+    p = predictions["price"].to_numpy(float)
+    y = predictions["price_next"].to_numpy(float)
+    pit_by_model = {
+        "dr_normal": clipped_normal_randomized_cell_pit(
+            p,
+            y,
+            predictions["variance_dr_normal"].to_numpy(float),
+            uniform,
+            tick_size=tick_size,
+        ),
+        "dras_normal": clipped_normal_randomized_cell_pit(
+            p,
+            y,
+            predictions["variance_dras_normal"].to_numpy(float),
+            uniform,
+            tick_size=tick_size,
+        ),
+        "mhb": hurdle_beta_randomized_cell_pit(
+            p,
+            y,
+            predictions["release"].to_numpy(float),
+            predictions["q_mhb"].to_numpy(float),
+            uniform,
+            tick_size=tick_size,
+        ),
+    }
+    grid = np.linspace(0.05, 0.95, 19)
+    rows = []
+    for slug, pit in pit_by_model.items():
+        cvm_grid = float(np.mean([(np.mean(pit <= point) - point) ** 2 for point in grid]))
+        rows.append(
+            {
+                "model": MODEL_NAMES[slug],
+                "model_slug": slug,
+                "mean": float(pit.mean()),
+                "variance": float(pit.var()),
+                "grid_cvm": cvm_grid,
+            }
+        )
+    return pd.DataFrame(rows)
+
+
+def contract_cluster_bootstrap(
+    predictions: pd.DataFrame,
+    *,
+    draws: int = 999,
+    seed: int = 77123,
+) -> pd.DataFrame:
+    """Paired contract-cluster bootstrap of score improvements over MHB."""
+
+    rng = np.random.default_rng(seed)
+    comparisons = [slug for slug in MODEL_NAMES if slug != "mhb"]
+    rows: list[dict[str, object]] = []
+    for weighting in ("equal", "volume"):
+        base_weights = (
+            np.ones(len(predictions))
+            if weighting == "equal"
+            else np.maximum(predictions["volume"].to_numpy(float), 0.0)
+        )
+        for metric in ("nll", "is"):
+            for other in comparisons:
+                work = pd.DataFrame(
+                    {
+                        "ticker": predictions["ticker"].to_numpy(),
+                        "weighted_difference": base_weights
+                        * (
+                            predictions[f"{metric}_{other}"].to_numpy(float)
+                            - predictions[f"{metric}_mhb"].to_numpy(float)
+                        ),
+                        "weight": base_weights,
+                    }
+                )
+                clusters = work.groupby("ticker", sort=False).sum(numeric_only=True)
+                clusters = clusters.loc[clusters["weight"] > 0]
+                numerator = clusters["weighted_difference"].to_numpy(float)
+                denominator = clusters["weight"].to_numpy(float)
+                point = float(numerator.sum() / denominator.sum())
+                indices = rng.integers(0, len(clusters), size=(draws, len(clusters)))
+                boot = numerator[indices].sum(axis=1) / denominator[indices].sum(axis=1)
+                rows.append(
+                    {
+                        "model_a": "MHB",
+                        "model_b": MODEL_NAMES[other],
+                        "metric": metric,
+                        "weighting": weighting,
+                        "difference_b_minus_a": point,
+                        "ci_low": float(np.quantile(boot, 0.025)),
+                        "ci_high": float(np.quantile(boot, 0.975)),
+                        "clusters": len(clusters),
+                        "draws": draws,
+                    }
+                )
+    return pd.DataFrame(rows)
+
+
+def subgroup_score_table(predictions: pd.DataFrame) -> pd.DataFrame:
+    """Proper-score summaries by update regime and market category.
+
+    The active-update rows provide a direct independent replication target for
+    the conditional evaluation in the source paper. The all-hour and inactive
+    rows assess the new unconditional forecasting task.
+    """
+
+    frames: list[tuple[str, str, pd.DataFrame]] = []
+    regimes = {
+        "all": np.ones(len(predictions), dtype=bool),
+        "active": predictions["updated"].to_numpy(int) == 1,
+        "inactive": predictions["updated"].to_numpy(int) == 0,
+    }
+    for regime, mask in regimes.items():
+        frames.append(("All", regime, predictions.loc[mask]))
+        for category, group in predictions.loc[mask].groupby("category", sort=True):
+            frames.append((str(category), regime, group))
+
+    rows: list[dict[str, object]] = []
+    for category, regime, frame in frames:
+        if frame.empty:
+            continue
+        for weighting in ("equal", "volume"):
+            weights = (
+                np.ones(len(frame))
+                if weighting == "equal"
+                else np.maximum(frame["volume"].to_numpy(float), 0.0)
+            )
+            total = float(weights.sum())
+            if total <= 0:
+                continue
+            for slug, model in MODEL_NAMES.items():
+                rows.append(
+                    {
+                        "category": category,
+                        "regime": regime,
+                        "model": model,
+                        "model_slug": slug,
+                        "weighting": weighting,
+                        "n": len(frame),
+                        "weight_sum": total,
+                        "negative_log_score": float(
+                            np.average(frame[f"nll_{slug}"], weights=weights)
+                        ),
+                        "interval_score": float(
+                            np.average(frame[f"is_{slug}"], weights=weights)
+                        ),
+                    }
+                )
+    return pd.DataFrame(rows)
+
+
+def hazard_score_table(predictions: pd.DataFrame) -> pd.DataFrame:
+    """Proper scores and calibration for the update-incidence margin."""
+
+    outcome = predictions["updated"].to_numpy(float)
+    forecasts = {
+        "unconstrained": predictions["q_unconstrained"].to_numpy(float),
+        "posthoc": predictions["q_posthoc"].to_numpy(float),
+        "mhb": predictions["q_mhb"].to_numpy(float),
+    }
+    labels = {
+        "unconstrained": "Separate hazard",
+        "posthoc": "Post-hoc coherent hazard",
+        "mhb": "MHB coherent hazard",
+    }
+    rows: list[dict[str, object]] = []
+    for weighting in ("equal", "volume"):
+        weights = (
+            np.ones(len(predictions))
+            if weighting == "equal"
+            else np.maximum(predictions["volume"].to_numpy(float), 0.0)
+        )
+        if weights.sum() <= 0:
+            continue
+        for slug, raw_forecast in forecasts.items():
+            forecast = np.clip(raw_forecast, 1e-10, 1.0 - 1e-10)
+            log_loss = -(outcome * np.log(forecast) + (1.0 - outcome) * np.log1p(-forecast))
+            rows.append(
+                {
+                    "model": labels[slug],
+                    "model_slug": slug,
+                    "weighting": weighting,
+                    "brier_score": float(np.average((forecast - outcome) ** 2, weights=weights)),
+                    "log_loss": float(np.average(log_loss, weights=weights)),
+                    "predicted_update_rate": float(np.average(forecast, weights=weights)),
+                    "observed_update_rate": float(np.average(outcome, weights=weights)),
+                }
+            )
+    return pd.DataFrame(rows)
+
+
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--panel", type=Path, required=True)
     parser.add_argument("--output", type=Path, default=Path("results/empirical"))
     parser.add_argument("--max-spread", type=float, default=0.20)
     parser.add_argument("--min-training-rows", type=int, default=1000)
+    parser.add_argument("--minimum-contract-forecasts", type=int, default=48)
     parser.add_argument("--tick-size", type=float, default=0.005)
+    parser.add_argument(
+        "--estimation-weighting",
+        choices=("equal", "volume", "log_volume"),
+        default="volume",
+    )
     args = parser.parse_args(argv)
 
     panel = pd.read_csv(args.panel)
@@ -201,17 +522,19 @@ def main(argv: list[str] | None = None) -> None:
         max_spread=args.max_spread,
         min_training_rows=args.min_training_rows,
         tick_size=args.tick_size,
+        estimation_weighting=args.estimation_weighting,
+        minimum_contract_forecasts=args.minimum_contract_forecasts,
     )
     args.output.mkdir(parents=True, exist_ok=True)
     scores.to_csv(args.output / "monthly_scores.csv", index=False)
     predictions.to_csv(args.output / "predictions.csv.gz", index=False, compression="gzip")
 
     aggregate = (
-        scores.groupby(["model", "weighting"], as_index=False)
+        scores.groupby(["model", "model_slug", "weighting"], sort=False)
         .apply(
             lambda group: pd.Series(
                 {
-                    metric: np.average(group[metric], weights=group["n"])
+                    metric: np.average(group[metric], weights=group["weight_sum"])
                     for metric in ("negative_log_score", "interval_score", "coverage", "width")
                 }
             ),
@@ -220,11 +543,23 @@ def main(argv: list[str] | None = None) -> None:
         .reset_index()
     )
     aggregate.to_csv(args.output / "aggregate_scores.csv", index=False)
+    calibration = calibration_table(predictions)
+    calibration.to_csv(args.output / "calibration.csv", index=False)
+    pits = pit_table(predictions, tick_size=args.tick_size)
+    pits.to_csv(args.output / "pit.csv", index=False)
+    bootstrap = contract_cluster_bootstrap(predictions)
+    bootstrap.to_csv(args.output / "cluster_bootstrap.csv", index=False)
+    subgroups = subgroup_score_table(predictions)
+    subgroups.to_csv(args.output / "subgroup_scores.csv", index=False)
+    hazards = hazard_score_table(predictions)
+    hazards.to_csv(args.output / "hazard_scores.csv", index=False)
     metadata = {
         "panel": str(args.panel),
         "max_spread": args.max_spread,
         "min_training_rows": args.min_training_rows,
+        "minimum_contract_forecasts": args.minimum_contract_forecasts,
         "tick_size": args.tick_size,
+        "estimation_weighting": args.estimation_weighting,
         "months": sorted(scores["month"].unique().tolist()),
         "test_predictions": int(len(predictions)),
     }
@@ -234,4 +569,3 @@ def main(argv: list[str] | None = None) -> None:
 
 if __name__ == "__main__":
     main()
-

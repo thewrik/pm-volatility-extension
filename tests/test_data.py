@@ -47,3 +47,30 @@ def test_candles_to_panel_enforces_exact_horizon_and_no_lookahead_deadline():
     assert panel.loc[0, "innovation"] == pytest.approx(0.02)
     assert not bool(panel.loc[1, "valid_one_hour"])
     assert np.isnan(panel.loc[2, "price_next"])
+
+
+def test_forecast_horizon_cannot_cross_scheduled_deadline():
+    market = {
+        "ticker": "TEST-2",
+        "open_time": "2025-01-01T00:00:00Z",
+        "close_time": "2025-01-01T03:00:00Z",
+        "expected_expiration_time": "2025-01-01T01:30:00Z",
+    }
+    job = MarketJob(
+        market=market,
+        series="TEST",
+        category="Test",
+        start=datetime(2025, 1, 1, tzinfo=timezone.utc),
+        end=datetime(2025, 1, 1, 3, tzinfo=timezone.utc),
+    )
+    base = int(job.start.timestamp())
+    raw = candles_to_frame(
+        job,
+        [
+            _candle(base + 3600, "0.30", "0.50"),
+            _candle(base + 7200, "0.40", "0.60"),
+        ],
+    )
+    panel = finalize_panel(raw)
+    assert panel.loc[0, "time_to_resolution"] == pytest.approx(0.5)
+    assert not bool(panel.loc[0, "valid_forecast"])

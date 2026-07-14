@@ -279,10 +279,11 @@ plus a residual probability of a partial, nonterminal quote update.
 \section{Estimation and proper evaluation}
 
 Each monthly test window is forecast using parameters estimated only on prior
-calendar months. We fit $K$ on the full training panel by Gaussian
+calendar months. We fit $K$ on the full training panel by volume-weighted Gaussian
 quasi-likelihood for the unconditional variance $r_t(K)p_t(1-p_t)$. Conditional
 on this release, $\gamma$ is estimated by Bernoulli likelihood for the update
-indicator under Equation~\eqref{eq:hazard}. This two-stage procedure targets
+indicator under Equation~\eqref{eq:hazard}, using the same forecast-origin volume
+weights. This two-stage procedure targets
 the identifying moments directly and avoids using the future update indicator
 as a forecast-origin regressor.
 
@@ -323,7 +324,7 @@ settlement timing is never used as a forecast-origin feature.
 
 The frozen panel spans August 2021 through April 2026 and includes prespecified
 series from Economics, Climate and Weather, Politics, and Sports. Markets must
-have at least 48 scheduled hours and at least 100 contracts of total volume. The
+have at least 48 valid one-hour forecast origins and at least 100 contracts of total volume. The
 main quote-quality rule requires a closing spread no wider than 20 cents;
 thresholds of 5, 10, 50, and 100 cents are sensitivity checks. Raw JSON is
 cached, every artifact is hashed, and failed requests are recorded in the run
@@ -431,4 +432,3 @@ SSRN working paper 7012278, 2026.
 \end{thebibliography}
 
 \end{document}
-

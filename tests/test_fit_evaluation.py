@@ -4,8 +4,15 @@ import pytest
 
 from pmvol.evaluation import (
     clipped_normal_cell_probability,
+    clipped_normal_randomized_cell_pit,
     hurdle_beta_cell_probability,
     hurdle_beta_interval,
+    hurdle_beta_randomized_cell_pit,
+)
+from pmvol.backtest import (
+    contract_cluster_bootstrap,
+    hazard_score_table,
+    subgroup_score_table,
 )
 from pmvol.fit import fit_hazard
 
@@ -64,3 +71,68 @@ def test_vectorized_probabilities_and_intervals_are_valid():
     assert np.all((normal > 0) & (normal <= 1))
     lo, hi = hurdle_beta_interval(p, r, q)
     assert np.all((0 <= lo) & (lo <= hi) & (hi <= 1))
+
+
+def test_randomized_cell_pits_stay_in_unit_interval():
+    p = np.array([0.05, 0.4, 0.9])
+    y = np.array([0.0, 0.4, 1.0])
+    r = np.array([0.01, 0.03, 0.2])
+    q = np.array([0.2, 0.4, 0.8])
+    u = np.array([0.1, 0.5, 0.9])
+    hb = hurdle_beta_randomized_cell_pit(p, y, r, q, u)
+    normal = clipped_normal_randomized_cell_pit(p, y, r * p * (1 - p), u)
+    assert np.all((0 <= hb) & (hb <= 1))
+    assert np.all((0 <= normal) & (normal <= 1))
+
+
+def test_vectorized_terminal_limit_is_three_point_law():
+    p = np.array([0.3, 0.3, 0.3])
+    y = np.array([0.0, 0.3, 1.0])
+    probability = hurdle_beta_cell_probability(
+        p,
+        y,
+        np.full(3, 0.2),
+        np.full(3, 0.2),
+        tick_size=0.005,
+    )
+    np.testing.assert_allclose(probability, [0.14, 0.8, 0.06], rtol=1e-12, atol=1e-12)
+    lower, upper = hurdle_beta_interval(
+        np.array([0.3]), np.array([0.2]), np.array([0.2]), level=0.95
+    )
+    np.testing.assert_array_equal(lower, [0.0])
+    np.testing.assert_array_equal(upper, [1.0])
+
+
+def test_subgroups_and_cluster_bootstrap_preserve_paired_improvements():
+    frame = pd.DataFrame(
+        {
+            "ticker": ["A", "A", "B", "B"],
+            "category": ["Macro", "Macro", "Sports", "Sports"],
+            "updated": [0, 1, 0, 1],
+            "volume": [1.0, 2.0, 3.0, 4.0],
+        }
+    )
+    for slug in ("dr_normal", "dras_normal", "beta_no_hurdle", "hurdle_posthoc", "mhb"):
+        frame[f"nll_{slug}"] = 1.0 if slug == "mhb" else 2.0
+        frame[f"is_{slug}"] = 0.5 if slug == "mhb" else 0.75
+
+    subgroups = subgroup_score_table(frame)
+    overall_active = subgroups.loc[
+        (subgroups["category"] == "All")
+        & (subgroups["regime"] == "active")
+        & (subgroups["model_slug"] == "mhb")
+        & (subgroups["weighting"] == "equal")
+    ]
+    assert overall_active.iloc[0]["n"] == 2
+    assert overall_active.iloc[0]["negative_log_score"] == pytest.approx(1.0)
+
+    boot = contract_cluster_bootstrap(frame, draws=99, seed=5)
+    assert np.allclose(boot.loc[boot["metric"] == "nll", "difference_b_minus_a"], 1.0)
+    assert np.allclose(boot.loc[boot["metric"] == "is", "difference_b_minus_a"], 0.25)
+
+    frame["q_unconstrained"] = [0.2, 0.8, 0.2, 0.8]
+    frame["q_posthoc"] = frame["q_unconstrained"]
+    frame["q_mhb"] = frame["q_unconstrained"]
+    hazards = hazard_score_table(frame)
+    assert len(hazards) == 6
+    assert np.allclose(hazards["observed_update_rate"].iloc[:3], 0.5)

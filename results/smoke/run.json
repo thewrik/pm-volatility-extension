@@ -2,9 +2,11 @@
   "panel": "data/processed/smoke_panel.csv.gz",
   "max_spread": 0.2,
   "min_training_rows": 1000,
+  "minimum_contract_forecasts": 48,
   "tick_size": 0.005,
+  "estimation_weighting": "volume",
   "months": [
     "2026-04"
   ],
-  "test_predictions": 7262
+  "test_predictions": 6588
 }

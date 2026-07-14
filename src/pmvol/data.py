@@ -312,7 +312,10 @@ def finalize_panel(frame: pd.DataFrame, period_minutes: int = 60) -> pd.DataFram
         & panel["price"].between(0, 1, inclusive="neither")
         & panel["price_next"].between(0, 1, inclusive="both")
         & panel["spread"].between(0, 1, inclusive="both")
-        & (panel["time_to_resolution"] > 0)
+        # The forecast horizon must end no later than the scheduled deadline;
+        # otherwise the finite deadline clock would mechanically release all
+        # uncertainty even though the API may continue showing stale quotes.
+        & (panel["time_to_resolution"] >= period_minutes / 60.0)
     )
     return panel.reset_index(drop=True)
 

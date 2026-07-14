@@ -68,3 +68,17 @@ cap, markets are selected at evenly spaced ranks in settlement-time order. This
 systematic sample preserves the full date range and uses metadata only. The
 smoke configuration retains its separate most-recent sampling rule and is never
 used for manuscript evidence.
+
+## Primary-weighting clarification (2026-07-15)
+
+Before any core-panel outcomes were scored, the primary estimation criterion
+was fixed to use forecast-origin hourly volume weights for the DR-AS parameter,
+the MHB variance release, and both hazard comparators. This matches the target
+paper's headline rule of using the same volume weights in QMLE and evaluation.
+Equal-weight proper scores remain a reported robustness view; they are not used
+to refit a second version of each model.
+
+Forecast origins whose one-hour horizon extends past the scheduled deadline are
+excluded. This is required by the finite-clock model and prevents stale
+post-deadline API quotes from being treated as a forecast failure of a process
+that should already have resolved.

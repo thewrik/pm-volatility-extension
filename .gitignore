@@ -17,6 +17,7 @@ data/cache/
 # Generated empirical outputs (small final tables/figures are force-added)
 results/tmp/
 results/simulation-smoke/
+results/**/predictions.csv.gz
 paper/build/
 paper/*.aux
 paper/*.bbl

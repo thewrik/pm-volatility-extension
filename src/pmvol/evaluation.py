@@ -9,6 +9,28 @@ from scipy.stats import beta as beta_dist
 from .model import interval_score
 
 
+def _coherent_beta_parameters(
+    price: np.ndarray,
+    release: np.ndarray,
+    hazard: np.ndarray,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    """Numerically stable parameters, including the terminal Bernoulli limit."""
+
+    p, r, q = np.broadcast_arrays(
+        np.asarray(price, float),
+        np.asarray(release, float),
+        np.asarray(hazard, float),
+    )
+    r = np.clip(r, 1e-10, 1.0)
+    q = np.clip(np.maximum(q, r), r, 1.0)
+    concentration = np.maximum(q / r - 1.0, 0.0)
+    terminal = concentration <= 1e-8
+    safe_concentration = np.maximum(concentration, 1e-8)
+    alpha = np.clip(p * safe_concentration, 1e-10, None)
+    beta = np.clip((1.0 - p) * safe_concentration, 1e-10, None)
+    return p, r, q, alpha, beta, terminal
+
+
 def _cells(realized: np.ndarray, tick_size: float) -> tuple[np.ndarray, np.ndarray]:
     if tick_size <= 0:
         raise ValueError("tick_size must be positive")
@@ -32,13 +54,14 @@ def hurdle_beta_cell_probability(
         np.asarray(release, float),
         np.asarray(hazard, float),
     )
-    r = np.clip(r, 1e-10, 1.0 - 1e-10)
-    q = np.clip(np.maximum(q, r + 1e-10), r + 1e-10, 1.0)
-    concentration = np.maximum(q / r - 1.0, 1e-8)
-    alpha = np.clip(p * concentration, 1e-10, None)
-    beta = np.clip((1.0 - p) * concentration, 1e-10, None)
+    p, r, q, alpha, beta, terminal = _coherent_beta_parameters(p, r, q)
     lower, upper = _cells(y, tick_size)
-    active = q * (betainc(alpha, beta, upper) - betainc(alpha, beta, lower))
+    active_beta = q * (betainc(alpha, beta, upper) - betainc(alpha, beta, lower))
+    active_terminal = q * (
+        (1.0 - p) * ((lower <= 0.0) & (0.0 <= upper))
+        + p * ((lower <= 1.0) & (1.0 <= upper))
+    )
+    active = np.where(terminal, active_terminal, active_beta)
     atom = (1.0 - q) * ((lower <= p) & (p <= upper))
     return np.clip(active + atom, np.finfo(float).tiny, 1.0)
 
@@ -65,6 +88,61 @@ def clipped_normal_cell_probability(
     return np.clip(probability, np.finfo(float).tiny, 1.0)
 
 
+def hurdle_beta_randomized_cell_pit(
+    price: np.ndarray,
+    realized: np.ndarray,
+    release: np.ndarray,
+    hazard: np.ndarray,
+    uniform: np.ndarray,
+    *,
+    tick_size: float = 0.005,
+) -> np.ndarray:
+    """Randomized PIT for the observed lattice cell under the mixed law."""
+
+    p, y, r, q, u = np.broadcast_arrays(
+        np.asarray(price, float),
+        np.asarray(realized, float),
+        np.asarray(release, float),
+        np.asarray(hazard, float),
+        np.asarray(uniform, float),
+    )
+    p, r, q, alpha, beta, terminal = _coherent_beta_parameters(p, r, q)
+    lower, _ = _cells(y, tick_size)
+    beta_before = q * betainc(alpha, beta, lower)
+    terminal_before = q * (1.0 - p) * (0.0 < lower)
+    active_before = np.where(terminal, terminal_before, beta_before)
+    cdf_before = active_before + (1.0 - q) * (p < lower)
+    cell_probability = hurdle_beta_cell_probability(
+        p, y, r, q, tick_size=tick_size
+    )
+    return np.clip(cdf_before + u * cell_probability, 0.0, 1.0)
+
+
+def clipped_normal_randomized_cell_pit(
+    price: np.ndarray,
+    realized: np.ndarray,
+    variance: np.ndarray,
+    uniform: np.ndarray,
+    *,
+    tick_size: float = 0.005,
+) -> np.ndarray:
+    """Randomized PIT for a lattice cell under a clipped latent Gaussian."""
+
+    p, y, var, u = np.broadcast_arrays(
+        np.asarray(price, float),
+        np.asarray(realized, float),
+        np.asarray(variance, float),
+        np.asarray(uniform, float),
+    )
+    scale = np.sqrt(np.maximum(var, 1e-12))
+    lower, _ = _cells(y, tick_size)
+    cdf_before = np.where(lower <= 0.0, 0.0, ndtr((lower - p) / scale))
+    cell_probability = clipped_normal_cell_probability(
+        p, y, var, tick_size=tick_size
+    )
+    return np.clip(cdf_before + u * cell_probability, 0.0, 1.0)
+
+
 def hurdle_beta_interval(
     price: np.ndarray,
     release: np.ndarray,
@@ -79,11 +157,7 @@ def hurdle_beta_interval(
     p, r, q = np.broadcast_arrays(
         np.asarray(price, float), np.asarray(release, float), np.asarray(hazard, float)
     )
-    r = np.clip(r, 1e-10, 1.0 - 1e-10)
-    q = np.clip(np.maximum(q, r + 1e-10), r + 1e-10, 1.0)
-    concentration = np.maximum(q / r - 1.0, 1e-8)
-    alpha_shape = np.clip(p * concentration, 1e-10, None)
-    beta_shape = np.clip((1.0 - p) * concentration, 1e-10, None)
+    p, r, q, alpha_shape, beta_shape, terminal = _coherent_beta_parameters(p, r, q)
     active_at_p = beta_dist.cdf(p, alpha_shape, beta_shape)
     atom_left = q * active_at_p
     atom_right = atom_left + 1.0 - q
@@ -97,8 +171,12 @@ def hurdle_beta_interval(
             (u - (1.0 - q)) / q,
         )
         active_probability = np.clip(active_probability, 0.0, 1.0)
-        result = beta_dist.ppf(active_probability, alpha_shape, beta_shape)
-        return np.where(in_atom, p, result)
+        beta_result = beta_dist.ppf(active_probability, alpha_shape, beta_shape)
+        terminal_left = q * (1.0 - p)
+        terminal_right = terminal_left + 1.0 - q
+        terminal_result = np.where(u <= terminal_left, 0.0, np.where(u <= terminal_right, p, 1.0))
+        result = np.where(terminal, terminal_result, beta_result)
+        return np.where(in_atom & ~terminal, p, result)
 
     tail = (1.0 - level) / 2.0
     return quantile(tail), quantile(1.0 - tail)
@@ -124,4 +202,3 @@ def summarize_forecast(
         "coverage": float(np.sum(w * covered)),
         "width": float(np.sum(w * (upper - lower))),
     }
-
