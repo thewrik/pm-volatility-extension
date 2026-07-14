@@ -34,13 +34,19 @@ $r_t=\Var(p_{t+1}\mid\F_t)/[p_t(1-p_t)]$, cannot exceed the update probability
 $q_t=\Pp(p_{t+1}\ne p_t\mid\F_t)$. We construct a martingale-coherent
 hurdle-beta distribution that realizes every feasible pair $0<r_t<q_t\le1$,
 contains a point mass at no change, respects the $[0,1]$ price boundary, and has
-closed-form quantiles. We also replace the locally additive DR-AS variance with
+tractable quantiles obtained from a standard beta inverse CDF. We also replace the locally additive DR-AS variance with
 a finite-step information-clock aggregation that cannot spend more than the
 remaining uncertainty and agrees with DR-AS to first order. A public-API
 replication evaluates the model in monthly expanding windows using proper
 mixed-distribution scores, multi-level coverage, and contract-cluster
-inference. Empirical results are reported only from the locked pipeline and are
-not asserted in this draft until the full backtest and robustness suite finish.
+inference. Across 1,007,560 out-of-sample hours, the replication confirms the
+active-update DR--AS gain over deadline resolution. On the full panel MHB
+improves volume-weighted tick log score over no-hurdle and post-hoc-coherence
+ablations, with paired cluster intervals excluding zero, but it does not beat
+the active-fit DR--AS normal benchmark on volume-weighted log or interval score.
+The density advantage over DR--AS appears in Economics and reverses in Politics
+and Sports. The result identifies both the value and the empirical limit of
+martingale coherence without a scheduled-event or jump component.
 \end{abstract}
 
 \section{Introduction}
@@ -79,7 +85,7 @@ extensive margin of information arrival to the intensive margin of belief
 revision.
 \item It constructs a hurdle-beta predictive law with exact martingale mean,
 exact unconditional variance, an explicit no-update atom, bounded support, and
-closed-form central intervals.
+tractable central intervals.
 \item It derives a finite-step information-clock version of DR-AS. The pure
 deadline component in fact has the exact normalized variance $\Delta/\tau$;
 order-flow intensity enters through an exponential clock map that preserves the
@@ -298,8 +304,11 @@ a hurdle;
 \item the proposed MHB model, fitted with coherence enforced throughout.
 \end{enumerate}
 
-Prices live on a half-cent mid-quote lattice. The primary log score therefore
-uses the forecast probability of the observed half-cent cell. For MHB this cell
+Prices live on a market-specific lattice. Kalshi metadata identify cent,
+deci-cent, and tapered price-level structures; a mid-quote has local grid width
+equal to one-half the finest bid/ask tick at that observation. The primary log
+score therefore uses the forecast probability of the observed realized-price
+cell. For MHB this cell
 probability includes both integrated beta density and the no-update atom. For a
 clipped Gaussian it includes the normal probability mapped into the cell and
 the boundary mass created by clipping. This makes the score proper on a common
@@ -308,8 +317,10 @@ one model but not another.
 
 We also report 50, 80, and 95 percent interval coverage, interval scores
 \citep{winkler1972decision,gneiting2007strictly}, update-hazard Brier scores,
-randomized probability integral transforms, and both equal- and volume-weighted
-aggregates. Contract-cluster resampling preserves within-contract dependence.
+randomized probability integral transforms, and equal-, volume-, and
+contract-balanced aggregates. Contract-balanced weights normalize hourly volume
+to sum to one within each contract, limiting domination by a few high-volume
+claims. Contract-cluster resampling preserves within-contract dependence.
 All preprocessing thresholds and subgroup analyses are fixed before the full
 test outcomes are evaluated.
 
@@ -318,7 +329,8 @@ test outcomes are evaluated.
 The independent replication uses Kalshi's unauthenticated historical market
 and candlestick endpoints. Hourly candlesticks contain closing YES bid and ask,
 last price, volume, and open interest. The forecast price is the closing
-mid-quote. Only consecutive observations exactly one hour apart are retained.
+mid-quote. Market-level price ranges determine the score lattice. Only
+consecutive observations exactly one hour apart are retained.
 The scheduled expected-expiration field defines time to resolution; realized
 settlement timing is never used as a forecast-origin feature.
 
@@ -352,7 +364,11 @@ inserted. The one-month smoke test is excluded from the manuscript evidence.}}
 First, the displayed quote is not the frictionless efficient price. Exact
 staleness can reflect no information, thin liquidity, exchange closure, or a
 latent move smaller than one tick. The rounding-aware score addresses the price
-lattice but does not identify these mechanisms separately.
+lattice but does not identify these mechanisms separately. Moreover, rounding a
+latent martingale need not itself produce a martingale. Theorem~\ref{thm:coherence}
+is exact for the price process being modeled; its empirical use on displayed
+mid-quotes is therefore a maintained forecasting restriction, not an assertion
+that market microstructure preserves the martingale property exactly.
 
 Second, the active beta law is a compact forecasting kernel rather than an exact
 transition density. It is useful because it is bounded, asymmetric, and moment
@@ -377,10 +393,15 @@ In a bounded prediction market, ``whether a price moves'' and ``how volatile it
 is'' are not separable modeling choices. The martingale and binary-payoff
 structure imposes the sharp inequality $r\le q$. Enforcing that law turns the
 DR-AS variance insight into an unconditional predictive distribution with a
-no-change atom, bounded support, and proper density forecasts. Whether the added
-structure improves out-of-sample performance is an empirical question; this
-repository is designed so that the answer can be negative without compromising
-the reproducibility of the test.
+no-change atom, bounded support, and proper density forecasts. The locked
+evidence is deliberately narrower than a dominance claim. Coherence materially
+improves density fit over both hurdle ablations, yet the active-fit DR--AS normal
+benchmark remains stronger under the volume-weighted criterion, especially in
+Politics and Sports. Thus the theorem is a necessary design restriction, not a
+sufficient volatility model: event clocks, jump mixtures, or richer active-move
+kernels are required before the unconditional extension can dominate in
+event-heavy markets. That negative boundary is part of the contribution rather
+than a result to be tuned away.
 
 \begin{thebibliography}{99}
 

@@ -41,6 +41,7 @@ def test_candles_to_panel_enforces_exact_horizon_and_no_lookahead_deadline():
     raw = candles_to_frame(job, candles)
     assert raw.loc[0, "price"] == 0.4
     assert raw.loc[0, "spread"] == 0.2
+    assert raw.loc[0, "tick_size"] == pytest.approx(0.005)
     assert raw.loc[0, "time_to_resolution"] == 5
     panel = finalize_panel(raw)
     assert bool(panel.loc[0, "valid_forecast"])
@@ -74,3 +75,25 @@ def test_forecast_horizon_cannot_cross_scheduled_deadline():
     panel = finalize_panel(raw)
     assert panel.loc[0, "time_to_resolution"] == pytest.approx(0.5)
     assert not bool(panel.loc[0, "valid_forecast"])
+
+
+def test_market_price_ranges_determine_midquote_lattice():
+    market = {
+        "ticker": "TEST-3",
+        "open_time": "2025-01-01T00:00:00Z",
+        "close_time": "2025-01-01T04:00:00Z",
+        "expected_expiration_time": "2025-01-01T05:00:00Z",
+        "price_level_structure": "deci_cent",
+        "price_ranges": [{"start": "0.0000", "end": "1.0000", "step": "0.0010"}],
+    }
+    job = MarketJob(
+        market=market,
+        series="TEST",
+        category="Test",
+        start=datetime(2025, 1, 1, tzinfo=timezone.utc),
+        end=datetime(2025, 1, 1, 4, tzinfo=timezone.utc),
+    )
+    base = int(job.start.timestamp())
+    raw = candles_to_frame(job, [_candle(base + 3600, "0.911", "0.930")])
+    assert raw.loc[0, "price"] == pytest.approx(0.9205)
+    assert raw.loc[0, "tick_size"] == pytest.approx(0.0005)

@@ -1,0 +1,99 @@
+\subsection{Locked out-of-sample results}
+
+The public-API acquisition selected 4,416 contracts and successfully retrieved 4,416. After forecast-validity, quote-quality, minimum-history, and expanding-window rules, the locked evaluation contains 1,007,560 hourly forecasts on 1,404 contracts across 50 test months. The unweighted update rate is 17.3\%; its forecast-origin volume-weighted counterpart is 44.5\%.
+
+\begin{table}[ht]
+\centering
+\caption{Full-panel out-of-sample distribution forecasts. Lower is better for both scores.}
+\label{tab:main-results}
+\small
+\begin{tabular}{lrrrr}
+\toprule
+Model & Tick log score & 95\% IS & Coverage & Width \\
+\midrule
+DR normal & 9.5984 & 0.2413 & 0.876 & 0.0971 \\
+DR--AS normal & 3.1246 & 0.1896 & 0.980 & 0.1483 \\
+Beta, no hurdle & 6.2704 & 0.2125 & 0.949 & 0.1286 \\
+Hurdle beta, post-hoc & 6.0321 & 0.2148 & 0.949 & 0.1386 \\
+MHB & 5.5271 & 0.2151 & 0.949 & 0.1390 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+On active updates, the independent replication preserves the source paper's structural ordering: DR--AS posts a volume-weighted 95\% interval score of 0.2744, versus 0.4412 for deadline resolution alone. The DR-minus-DR--AS improvement is 0.1667 with a 95\% contract-cluster interval [0.0158, 0.2620].
+
+Volume is concentrated: the two largest contracts contribute 50.3\% of evaluation weight. Under the pre-specified contract-balanced robustness rule, MHB's tick log score is 6.5503, versus 4.0972 for DR--AS normal and 8.8790 for the post-hoc hurdle; the corresponding interval scores are 0.2250, 0.2167, and 0.2246. Under equal observation weights, by contrast, MHB has the best tick log score (1.9974 versus 3.2032 for DR--AS) but a worse interval score (0.0787 versus 0.0750).
+
+\begin{table}[ht]
+\centering
+\caption{Volume-weighted category results (descriptive).}
+\label{tab:category-results}
+\small
+\begin{tabular}{lrrrr}
+\toprule
+Category & DR--AS log & MHB log & DR--AS IS & MHB IS \\
+\midrule
+Economics & 3.8702 & 3.4998 & 0.1857 & 0.1933 \\
+Politics & 2.9638 & 3.4579 & 0.1589 & 0.1934 \\
+Sports & 3.1669 & 9.7104 & 0.2435 & 0.2593 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The MHB density advantage over DR--AS appears in Economics but reverses in Politics and Sports; interval scores do not improve. These category results are descriptive, not multiplicity-adjusted. The two pre-specified daily weather series contribute no contracts after the 48-valid-origin rule, which is a limitation of this public-API replication rather than a basis for changing the locked filter.
+
+Against the active-fit DR--AS normal benchmark, MHB's tick log score is higher by 2.4025 (95\% contract-cluster interval [0.8307, 6.4983]).
+Against the active-fit DR--AS normal benchmark, MHB's 95\% interval score is higher by 0.0255 (95\% contract-cluster interval [0.0107, 0.0374]).
+
+Against the beta law without a hurdle, MHB's tick log score is lower by 0.7433 (95\% contract-cluster interval [0.6201, 1.0664]).
+Against the beta law without a hurdle, the beta law without a hurdle-minus-MHB 95\% interval score difference is -0.0026; the 95\% contract-cluster interval [-0.0145, 0.0045] includes zero.
+
+Against the post-hoc coherent hurdle, MHB's tick log score is lower by 0.5049 (95\% contract-cluster interval [0.1329, 1.4202]).
+Against the post-hoc coherent hurdle, the post-hoc coherent hurdle-minus-MHB 95\% interval score difference is -0.0004; the 95\% contract-cluster interval [-0.0011, 0.0000] includes zero.
+
+\begin{table}[ht]
+\centering
+\caption{Volume-weighted scores by update regime.}
+\label{tab:regime-results}
+\small
+\begin{tabular}{llrr}
+\toprule
+Regime & Model & Tick log score & 95\% IS \\
+\midrule
+All & DR--AS normal & 3.1246 & 0.1896 \\
+ & Beta, no hurdle & 6.2704 & 0.2125 \\
+ & Hurdle beta, post-hoc & 6.0321 & 0.2148 \\
+ & MHB & 5.5271 & 0.2151 \\
+\addlinespace
+Active & DR--AS normal & 3.9144 & 0.2744 \\
+ & Beta, no hurdle & 7.9759 & 0.3426 \\
+ & Hurdle beta, post-hoc & 9.4564 & 0.3378 \\
+ & MHB & 8.3244 & 0.3385 \\
+\addlinespace
+Inactive & DR--AS normal & 2.4925 & 0.1218 \\
+ & Beta, no hurdle & 4.9054 & 0.1084 \\
+ & Hurdle beta, post-hoc & 3.2915 & 0.1164 \\
+ & MHB & 3.2884 & 0.1164 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+MHB central-interval coverage at the pre-specified levels is 50\%: 67.2\%, 80\%: 87.7\%, 95\%: 94.9\%. Its volume-weighted update-hazard Brier score is 0.2307, versus 0.2283 for the separately fitted hazard. The separate hazard violates $q\ge r$ at 5.49\% of test origins before post-hoc repair.
+
+\begin{table}[ht]
+\centering
+\caption{Pre-specified spread-threshold sensitivity.}
+\label{tab:spread-sensitivity}
+\small
+\begin{tabular}{lrrrr}
+\toprule
+Max spread & Post-hoc log & MHB log & Post-hoc IS & MHB IS \\
+\midrule
+0.05 & 6.1602 & 5.5615 & 0.2168 & 0.2172 \\
+0.10 & 6.0445 & 5.5344 & 0.2151 & 0.2155 \\
+0.20 & 6.0321 & 5.5271 & 0.2148 & 0.2151 \\
+0.50 & 6.0268 & 5.5250 & 0.2149 & 0.2153 \\
+1.00 & 6.0608 & 5.5246 & 0.2151 & 0.2155 \\
+\bottomrule
+\end{tabular}
+\end{table}

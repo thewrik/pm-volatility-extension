@@ -198,6 +198,7 @@
   "config": {
     "description": "Fast end-to-end validation panel; not for headline claims",
     "end": "2026-04-30T23:59:59Z",
+    "market_sampling": "recent",
     "max_markets_per_series": 24,
     "minimum_market_lifetime_hours": 48,
     "minimum_market_volume": 1000,
@@ -214,13 +215,13 @@
     ],
     "start": "2025-01-01T00:00:00Z"
   },
-  "config_sha256": "b5c3904d580578a486bb5ded82dbc9025667880be0680a802e1ec3be10390d8b",
-  "created_at": "2026-07-14T16:37:43.225022Z",
+  "config_sha256": "89ea0f8fd47c96feaa2400f7115a47073f6a304d26a6d2e99a8f8ddee2a59d54",
+  "created_at": "2026-07-14T17:16:46.564215Z",
   "failures": [],
   "markets_selected": 48,
   "markets_succeeded": 48,
   "output": "data/processed/smoke_panel.csv.gz",
-  "output_sha256": "aac17e19ff5b891d19e8486200be25fc0b84207fdd84b326c9f7f8932631271a",
+  "output_sha256": "2eedabfe8f5343527e4a61be8ee19dc0b94026e5e78470a12480bec088dd6c31",
   "rows": 14494,
   "valid_forecasts": 11965
 }

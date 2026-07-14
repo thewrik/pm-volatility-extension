@@ -9,6 +9,11 @@ All,all,DR-AS normal,dras_normal,volume,6588,465323.54000000004,3.32217588782184
 All,all,"Beta, no hurdle",beta_no_hurdle,volume,6588,465323.54000000004,3.1430190738582375,0.1882742524352409
 All,all,"Hurdle beta, post-hoc coherence",hurdle_posthoc,volume,6588,465323.54000000004,22.918271491810852,0.23557572093992224
 All,all,MHB,mhb,volume,6588,465323.54000000004,2.9514960387431657,0.21426403062530142
+All,all,DR normal,dr_normal,contract_balanced,6588,24.0,3.120077869295328,0.08777213560527726
+All,all,DR-AS normal,dras_normal,contract_balanced,6588,24.0,2.929835717315742,0.14344597121118213
+All,all,"Beta, no hurdle",beta_no_hurdle,contract_balanced,6588,24.0,2.701227152845116,0.12154787363979118
+All,all,"Hurdle beta, post-hoc coherence",hurdle_posthoc,contract_balanced,6588,24.0,10.095045907433603,0.12754143956807104
+All,all,MHB,mhb,contract_balanced,6588,24.0,2.224778136652635,0.12387998053402606
 Economics,all,DR normal,dr_normal,equal,6588,6588.0,4.1858465017937,0.12036948459147646
 Economics,all,DR-AS normal,dras_normal,equal,6588,6588.0,3.397683653189832,0.12119456808204616
 Economics,all,"Beta, no hurdle",beta_no_hurdle,equal,6588,6588.0,3.1064373744943747,0.11806294565458701
@@ -19,6 +24,11 @@ Economics,all,DR-AS normal,dras_normal,volume,6588,465323.54000000004,3.32217588
 Economics,all,"Beta, no hurdle",beta_no_hurdle,volume,6588,465323.54000000004,3.1430190738582375,0.1882742524352409
 Economics,all,"Hurdle beta, post-hoc coherence",hurdle_posthoc,volume,6588,465323.54000000004,22.918271491810852,0.23557572093992224
 Economics,all,MHB,mhb,volume,6588,465323.54000000004,2.9514960387431657,0.21426403062530142
+Economics,all,DR normal,dr_normal,contract_balanced,6588,24.0,3.120077869295328,0.08777213560527726
+Economics,all,DR-AS normal,dras_normal,contract_balanced,6588,24.0,2.929835717315742,0.14344597121118213
+Economics,all,"Beta, no hurdle",beta_no_hurdle,contract_balanced,6588,24.0,2.701227152845116,0.12154787363979118
+Economics,all,"Hurdle beta, post-hoc coherence",hurdle_posthoc,contract_balanced,6588,24.0,10.095045907433603,0.12754143956807104
+Economics,all,MHB,mhb,contract_balanced,6588,24.0,2.224778136652635,0.12387998053402606
 All,active,DR normal,dr_normal,equal,2584,2584.0,8.388719277549166,0.2485627812345268
 All,active,DR-AS normal,dras_normal,equal,2584,2584.0,6.214214397112841,0.23618022183969237
 All,active,"Beta, no hurdle",beta_no_hurdle,equal,2584,2584.0,5.499758915985299,0.23373969016966054
@@ -29,6 +39,11 @@ All,active,DR-AS normal,dras_normal,volume,2584,227361.33000000002,3.58957206078
 All,active,"Beta, no hurdle",beta_no_hurdle,volume,2584,227361.33000000002,3.467707347081821,0.24694572445066298
 All,active,"Hurdle beta, post-hoc coherence",hurdle_posthoc,volume,2584,227361.33000000002,46.611209758395525,0.41595288621260174
 All,active,MHB,mhb,volume,2584,227361.33000000002,5.7052680796613,0.31004408766634356
+All,active,DR normal,dr_normal,contract_balanced,2584,23.0,4.973080176792755,0.1535150106036204
+All,active,DR-AS normal,dras_normal,contract_balanced,2584,23.0,3.08808125506691,0.1716548794025129
+All,active,"Beta, no hurdle",beta_no_hurdle,contract_balanced,2584,23.0,2.83121773156332,0.14832112787244692
+All,active,"Hurdle beta, post-hoc coherence",hurdle_posthoc,contract_balanced,2584,23.0,30.209042056776095,0.17881029474914098
+All,active,MHB,mhb,contract_balanced,2584,23.0,3.8448238946496347,0.15908462142118465
 Economics,active,DR normal,dr_normal,equal,2584,2584.0,8.388719277549166,0.2485627812345268
 Economics,active,DR-AS normal,dras_normal,equal,2584,2584.0,6.214214397112841,0.23618022183969237
 Economics,active,"Beta, no hurdle",beta_no_hurdle,equal,2584,2584.0,5.499758915985299,0.23373969016966054
@@ -39,6 +54,11 @@ Economics,active,DR-AS normal,dras_normal,volume,2584,227361.33000000002,3.58957
 Economics,active,"Beta, no hurdle",beta_no_hurdle,volume,2584,227361.33000000002,3.467707347081821,0.24694572445066298
 Economics,active,"Hurdle beta, post-hoc coherence",hurdle_posthoc,volume,2584,227361.33000000002,46.611209758395525,0.41595288621260174
 Economics,active,MHB,mhb,volume,2584,227361.33000000002,5.7052680796613,0.31004408766634356
+Economics,active,DR normal,dr_normal,contract_balanced,2584,23.0,4.973080176792755,0.1535150106036204
+Economics,active,DR-AS normal,dras_normal,contract_balanced,2584,23.0,3.08808125506691,0.1716548794025129
+Economics,active,"Beta, no hurdle",beta_no_hurdle,contract_balanced,2584,23.0,2.83121773156332,0.14832112787244692
+Economics,active,"Hurdle beta, post-hoc coherence",hurdle_posthoc,contract_balanced,2584,23.0,30.209042056776095,0.17881029474914098
+Economics,active,MHB,mhb,contract_balanced,2584,23.0,3.8448238946496347,0.15908462142118465
 All,inactive,DR normal,dr_normal,equal,4004,4004.0,1.4735030321253364,0.037639345099557846
 All,inactive,DR-AS normal,dras_normal,equal,4004,4004.0,1.580022453814942,0.04698804228040835
 All,inactive,"Beta, no hurdle",beta_no_hurdle,equal,4004,4004.0,1.5618961998658654,0.04341042122228182
@@ -49,6 +69,11 @@ All,inactive,DR-AS normal,dras_normal,volume,4004,237962.21000000002,3.066691836
 All,inactive,"Beta, no hurdle",beta_no_hurdle,volume,4004,237962.21000000002,2.8327952041290176,0.13221651154233127
 All,inactive,"Hurdle beta, post-hoc coherence",hurdle_posthoc,volume,4004,237962.21000000002,0.2808201254842978,0.06323410334431234
 All,inactive,MHB,mhb,volume,4004,237962.21000000002,0.3204006486811853,0.12275083970172071
+All,inactive,DR normal,dr_normal,contract_balanced,4004,24.0,1.5334580854239181,0.03995072757738365
+All,inactive,DR-AS normal,dras_normal,contract_balanced,4004,24.0,2.7330759879553654,0.11919470275458684
+All,inactive,"Beta, no hurdle",beta_no_hurdle,contract_balanced,4004,24.0,2.494410324121488,0.09489546224222158
+All,inactive,"Hurdle beta, post-hoc coherence",hurdle_posthoc,contract_balanced,4004,24.0,1.101396895463506,0.0785393656173247
+All,inactive,MHB,mhb,contract_balanced,4004,24.0,1.0098321120237272,0.0902102249623477
 Economics,inactive,DR normal,dr_normal,equal,4004,4004.0,1.4735030321253364,0.037639345099557846
 Economics,inactive,DR-AS normal,dras_normal,equal,4004,4004.0,1.580022453814942,0.04698804228040835
 Economics,inactive,"Beta, no hurdle",beta_no_hurdle,equal,4004,4004.0,1.5618961998658654,0.04341042122228182
@@ -59,3 +84,8 @@ Economics,inactive,DR-AS normal,dras_normal,volume,4004,237962.21000000002,3.066
 Economics,inactive,"Beta, no hurdle",beta_no_hurdle,volume,4004,237962.21000000002,2.8327952041290176,0.13221651154233127
 Economics,inactive,"Hurdle beta, post-hoc coherence",hurdle_posthoc,volume,4004,237962.21000000002,0.2808201254842978,0.06323410334431234
 Economics,inactive,MHB,mhb,volume,4004,237962.21000000002,0.3204006486811853,0.12275083970172071
+Economics,inactive,DR normal,dr_normal,contract_balanced,4004,24.0,1.5334580854239181,0.03995072757738365
+Economics,inactive,DR-AS normal,dras_normal,contract_balanced,4004,24.0,2.7330759879553654,0.11919470275458684
+Economics,inactive,"Beta, no hurdle",beta_no_hurdle,contract_balanced,4004,24.0,2.494410324121488,0.09489546224222158
+Economics,inactive,"Hurdle beta, post-hoc coherence",hurdle_posthoc,contract_balanced,4004,24.0,1.101396895463506,0.0785393656173247
+Economics,inactive,MHB,mhb,contract_balanced,4004,24.0,1.0098321120237272,0.0902102249623477

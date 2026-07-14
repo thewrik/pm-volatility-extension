@@ -11,6 +11,15 @@ Target: Xi, Moallemi, Pai, and Wang (2026), arXiv:2607.08199v2.
 - Kalshi's public historical candlestick API now supplies hourly bid, ask,
   last-price, volume, and open-interest fields. This repository uses that API
   for an independent replication. Exact row equality is not assumed.
+- The completed acquisition selected and retrieved all 4,416 frozen contracts
+  with no failed requests, yielding 1,534,654 raw rows and 1,112,828 valid
+  one-hour forecast origins before the minimum-history and spread rules.
+- The primary expanding-window test contains 1,007,560 forecasts on 1,404
+  contracts over 50 test months, including 174,264 active updates. This is not
+  row-equivalent to the target paper's 880,719 active-update forecasts.
+- The two pre-specified daily weather series supply no contracts after the
+  48-valid-origin rule. The final scored categories are Economics, Politics,
+  and Sports; the locked threshold was not relaxed after this fact was known.
 
 ## Verified model ingredients
 
@@ -82,3 +91,22 @@ Forecast origins whose one-hour horizon extends past the scheduled deadline are
 excluded. This is required by the finite-clock model and prevents stale
 post-deadline API quotes from being treated as a forecast failure of a process
 that should already have resolved.
+
+## Market-specific price lattice (2026-07-15)
+
+Before core scoring, a raw-value audit found both cent and deci-cent quotes in
+the historical API. The primary log score therefore uses each market's
+`price_ranges` metadata rather than a global half-cent cell. For a closing
+mid-quote, the local grid width is one-half the finest valid bid/ask tick at the
+observation; the realized next-hour grid width defines the scored cell. Kalshi's
+fixed-point documentation identifies `linear_cent`, `tapered_deci_cent`, and
+`deci_cent` as distinct per-market structures.
+
+## Concentrated evaluation volume (2026-07-15)
+
+Before model scoring, forecast-origin weights showed that the two 2024
+presidential contracts account for roughly one-half of total volume under the
+20-cent spread rule. The target paper's volume-weighted criterion remains the
+primary replication metric, but equal-observation and contract-balanced scores
+are now mandatory robustness views. Contract-balanced weights normalize volume
+to sum to one within each contract; they are not used to refit the models.

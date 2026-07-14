@@ -46,6 +46,10 @@ pages, and general scholarly web search. Queries included:
 - `bounded martingale update probability conditional variance`
 - `hurdle beta martingale`
 - `Beta mixture no change price martingale`
+- `"A Local-Volatility Theory of Prediction Markets" PDF Xu 7012278`
+- `"normalized variance" "update probability" martingale`
+- `"hurdle beta" martingale prediction market`
+- `"variance release" "update hazard" prediction market`
 
 Screened primary papers and working papers:
 
@@ -53,7 +57,7 @@ Screened primary papers and working papers:
 |---|---|---|
 | [Xi et al. (2026)](https://arxiv.org/abs/2607.08199) | Wright-Fisher deadline variance, order-flow variance, full-panel robustness. | Explicitly leaves the update/no-update hazard for future work; no mixed predictive law or `r <= q` restriction. |
 | [Dalen (2025)](https://arxiv.org/abs/2510.15205) | Martingale logit jump-diffusion, jump intensity, scheduled events. | Continuous-time kernel and derivative layer; no observed no-change atom coupled to normalized variance release. |
-| [Xu (2026)](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=7012278) | Absorbed event-market martingales, boundary-degenerate local volatility, information clocks. | Focuses on admissible local-volatility shapes and transient-mispricing autocorrelation; abstract and indexed text show no hurdle law or update-incidence inequality. Full PDF access remained blocked by SSRN and must be checked before a final novelty claim. |
+| [Xu (2026)](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=7012278) | Absorbed event-market martingales, boundary-degenerate local volatility, information clocks, and a simplex structure theorem. | The full 25-page indexed abstract focuses on admissible local-volatility shapes and transient-mispricing autocorrelation; it reports no hurdle law or update-incidence inequality. Full PDF access remained blocked by SSRN and must be checked before a final novelty claim. |
 | [Catania et al. (2019)](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3349118) | Zero-inflated discrete price changes and density forecasts. | General high-frequency equity model with latent Skellam mixtures; no binary-payoff boundary or martingale coupling between zero mass and variance. |
 | [Hol\'y (2023)](https://arxiv.org/abs/2211.12376) | Zero-inflated Skellam GARCH for discrete prices. | General intraday prices; support is not `[0,1]` and the extensive/intensive margins are not constrained by remaining Bernoulli uncertainty. |
 | [Han and Irie (2024)](https://arxiv.org/abs/2403.10945) | Zero-inflated stochastic volatility and interval calibration. | CPI components with exact zeros, not prediction-market posterior martingales. |

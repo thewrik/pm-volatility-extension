@@ -30,12 +30,30 @@ which has conditional mean exactly `p_t`, unconditional variance exactly
 `r_t p_t(1-p_t)`, and no-change probability exactly `1-q_t` in the continuous
 price idealization. A rounding-aware score is provided for observed tick data.
 
-## Status
+## Locked findings
 
-This is an active research artifact, not yet a finished paper. Claims are
-tracked by evidence level in [`docs/claims.md`](docs/claims.md); open risks and
-reproduction gaps are explicit in [`docs/audit.md`](docs/audit.md). No empirical
-superiority claim should be made until the locked out-of-sample backtest passes.
+The repository contains a completed theorem/simulation audit and a frozen
+public-API backtest with 1,007,560 out-of-sample hourly forecasts on 1,404
+contracts across 50 months.
+
+- The active-update replication confirms that DR-AS improves on deadline
+  resolution alone: the volume-weighted 95% interval-score gain is 0.1667, with
+  contract-cluster interval `[0.0158, 0.2620]`.
+- MHB improves volume-weighted tick log score over the beta-without-hurdle and
+  post-hoc-coherence ablations. The paired improvement intervals are
+  `[0.620, 1.066]` and `[0.133, 1.420]`.
+- MHB does **not** dominate the active-fit DR-AS normal benchmark. DR-AS is
+  better on the primary volume-weighted log and interval scores, and on the
+  contract-balanced versions. MHB has the best equal-observation log score.
+- Category results are heterogeneous: MHB's density advantage over DR-AS
+  appears in Economics and reverses in Politics and Sports. These subgroup
+  results are descriptive.
+
+Claims and rejected hypotheses are tracked in [`docs/claims.md`](docs/claims.md);
+protocol amendments and threats to validity are explicit in
+[`docs/audit.md`](docs/audit.md). The manuscript treats the negative boundary as
+evidence that coherence is necessary but not sufficient without a richer jump
+or scheduled-event component.
 
 ## Reproduce
 
@@ -50,7 +68,8 @@ python3 -m venv .venv
 # Theory/simulation checks and expanding-window empirical evaluation
 .venv/bin/pmv-simulate --output results/simulation
 .venv/bin/pmv-backtest --panel data/processed/core_panel.csv.gz \
-  --output results/empirical
+  --output results/empirical/main
+.venv/bin/pmv-report --results results/empirical/main
 ```
 
 The downloader uses only public, unauthenticated Kalshi market-data endpoints.
@@ -72,4 +91,3 @@ to be the exact finite-time Wright-Fisher transition law. The empirical study
 uses public candlesticks and therefore need not exactly reproduce the authors'
 private or separately constructed hourly panel. Results must be described as an
 independent replication unless row-level equality can be established.
-

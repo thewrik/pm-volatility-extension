@@ -10,6 +10,7 @@ from pmvol.evaluation import (
     hurdle_beta_randomized_cell_pit,
 )
 from pmvol.backtest import (
+    active_replication_bootstrap,
     contract_cluster_bootstrap,
     hazard_score_table,
     subgroup_score_table,
@@ -51,6 +52,9 @@ def test_constrained_hazard_predictions_are_feasible_and_calibrated_in_mean():
     assert np.all(predicted >= release)
     assert predicted.mean() == pytest.approx(frame.updated.mean(), abs=0.015)
 
+    warm = fit_hazard(frame, release, constrained=True, initial_model=model)
+    np.testing.assert_allclose(warm.predict(frame, release), predicted, atol=2e-5)
+
 
 def test_unconstrained_fit_can_violate_bound():
     frame, release = _frame()
@@ -71,6 +75,11 @@ def test_vectorized_probabilities_and_intervals_are_valid():
     assert np.all((normal > 0) & (normal <= 1))
     lo, hi = hurdle_beta_interval(p, r, q)
     assert np.all((0 <= lo) & (lo <= hi) & (hi <= 1))
+
+    varying_ticks = hurdle_beta_cell_probability(
+        p, y, r, q, tick_size=np.array([0.0005, 0.005, 0.01])
+    )
+    assert np.all((varying_ticks > 0) & (varying_ticks <= 1))
 
 
 def test_randomized_cell_pits_stay_in_unit_interval():
@@ -130,9 +139,15 @@ def test_subgroups_and_cluster_bootstrap_preserve_paired_improvements():
     assert np.allclose(boot.loc[boot["metric"] == "nll", "difference_b_minus_a"], 1.0)
     assert np.allclose(boot.loc[boot["metric"] == "is", "difference_b_minus_a"], 0.25)
 
+    replication = active_replication_bootstrap(frame, draws=99, seed=6)
+    assert np.allclose(
+        replication.loc[replication["metric"] == "nll", "difference_b_minus_a"],
+        0.0,
+    )
+
     frame["q_unconstrained"] = [0.2, 0.8, 0.2, 0.8]
     frame["q_posthoc"] = frame["q_unconstrained"]
     frame["q_mhb"] = frame["q_unconstrained"]
     hazards = hazard_score_table(frame)
-    assert len(hazards) == 6
+    assert len(hazards) == 9
     assert np.allclose(hazards["observed_update_rate"].iloc[:3], 0.5)

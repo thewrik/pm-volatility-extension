@@ -59,7 +59,7 @@ def _model_scores(
     release: np.ndarray,
     hazard: np.ndarray,
     *,
-    tick_size: float,
+    tick_size: np.ndarray | float,
     level: float,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     probability = hurdle_beta_cell_probability(
@@ -75,12 +75,37 @@ def _model_scores(
     return probability, lower, upper
 
 
+def _observation_ticks(frame: pd.DataFrame, override: float | None) -> np.ndarray:
+    if override is not None:
+        return np.full(len(frame), override, dtype=float)
+    if "tick_size_next" in frame:
+        return frame["tick_size_next"].to_numpy(float)
+    return np.full(len(frame), 0.005, dtype=float)
+
+
+def _evaluation_weights(frame: pd.DataFrame) -> dict[str, np.ndarray]:
+    volume = np.maximum(frame["volume"].to_numpy(float), 0.0)
+    work = pd.DataFrame({"ticker": frame["ticker"].to_numpy(), "volume": volume})
+    total_volume = work.groupby("ticker", sort=False)["volume"].transform("sum").to_numpy()
+    contract_rows = work.groupby("ticker", sort=False)["volume"].transform("size").to_numpy()
+    contract_balanced = np.where(
+        total_volume > 0,
+        volume / np.maximum(total_volume, 1e-12),
+        1.0 / contract_rows,
+    )
+    return {
+        "equal": np.ones(len(frame)),
+        "volume": volume,
+        "contract_balanced": contract_balanced,
+    }
+
+
 def expanding_backtest(
     panel: pd.DataFrame,
     *,
     max_spread: float = 0.20,
     min_training_rows: int = 1000,
-    tick_size: float = 0.005,
+    tick_size: float | None = None,
     level: float = 0.95,
     estimation_weighting: str = "volume",
     minimum_contract_forecasts: int = 48,
@@ -89,6 +114,10 @@ def expanding_backtest(
     months = sorted(data["forecast_month"].unique())
     records: list[dict[str, object]] = []
     predictions: list[pd.DataFrame] = []
+    previous_k_original: float | None = None
+    previous_k_mhb: float | None = None
+    previous_constrained = None
+    previous_unconstrained = None
 
     for month in months:
         test = data.loc[data["forecast_month"] == month]
@@ -103,12 +132,14 @@ def expanding_backtest(
             finite_clock=False,
             active_only=True,
             weighting=estimation_weighting,
+            initial_k=previous_k_original,
         )
         k_mhb = fit_order_flow_k(
             train,
             finite_clock=True,
             active_only=False,
             weighting=estimation_weighting,
+            initial_k=previous_k_mhb,
         )
         train_release = clock_release(
             train["price"],
@@ -122,16 +153,23 @@ def expanding_backtest(
             train_release,
             constrained=True,
             weighting=estimation_weighting,
+            initial_model=previous_constrained,
         )
         unconstrained = fit_hazard(
             train,
             train_release,
             constrained=False,
             weighting=estimation_weighting,
+            initial_model=previous_unconstrained,
         )
+        previous_k_original = k_original
+        previous_k_mhb = k_mhb
+        previous_constrained = constrained
+        previous_unconstrained = unconstrained
 
         p = test["price"].to_numpy(float)
         y = test["price_next"].to_numpy(float)
+        observation_ticks = _observation_ticks(test, tick_size)
         test_release = clock_release(
             p,
             test["time_to_resolution"],
@@ -160,10 +198,7 @@ def expanding_backtest(
             "hurdle_posthoc": q_posthoc,
             "mhb": q_mhb,
         }
-        weight_sets = {
-            "equal": np.ones(len(test)),
-            "volume": np.maximum(test["volume"].to_numpy(float), 0.0),
-        }
+        weight_sets = _evaluation_weights(test)
 
         prediction = test[
             [
@@ -177,6 +212,7 @@ def expanding_backtest(
                 "volume",
             ]
         ].copy()
+        prediction["tick_size_next"] = observation_ticks
         prediction["month"] = month
         prediction["release"] = test_release
         prediction["q_mhb"] = q_mhb
@@ -188,7 +224,7 @@ def expanding_backtest(
 
         for slug, variance in normal_models.items():
             probability = clipped_normal_cell_probability(
-                p, y, variance, tick_size=tick_size
+                p, y, variance, tick_size=observation_ticks
             )
             lower, upper = normal_reference_interval(p, variance)
             prediction[f"nll_{slug}"] = -np.log(probability)
@@ -215,7 +251,11 @@ def expanding_backtest(
 
         for slug, hazard in beta_models.items():
             probability, lower, upper = _model_scores(
-                test, test_release, hazard, tick_size=tick_size, level=level
+                test,
+                test_release,
+                hazard,
+                tick_size=observation_ticks,
+                level=level,
             )
             prediction[f"nll_{slug}"] = -np.log(probability)
             prediction[f"is_{slug}"] = interval_score(
@@ -271,10 +311,7 @@ def calibration_table(
         "dr_normal": predictions["variance_dr_normal"].to_numpy(float),
         "dras_normal": predictions["variance_dras_normal"].to_numpy(float),
     }
-    weights_by_name = {
-        "equal": np.ones(len(predictions)),
-        "volume": np.maximum(predictions["volume"].to_numpy(float), 0.0),
-    }
+    weights_by_name = _evaluation_weights(predictions)
     rows: list[dict[str, object]] = []
     from scipy.stats import norm
 
@@ -308,27 +345,33 @@ def calibration_table(
     return pd.DataFrame(rows)
 
 
-def pit_table(predictions: pd.DataFrame, *, tick_size: float, seed: int = 41731) -> pd.DataFrame:
+def pit_table(
+    predictions: pd.DataFrame,
+    *,
+    tick_size: float | None,
+    seed: int = 41731,
+) -> pd.DataFrame:
     """Randomized cell-PIT diagnostics without invalid iid p-values."""
 
     rng = np.random.default_rng(seed)
     uniform = rng.random(len(predictions))
     p = predictions["price"].to_numpy(float)
     y = predictions["price_next"].to_numpy(float)
+    observation_ticks = _observation_ticks(predictions, tick_size)
     pit_by_model = {
         "dr_normal": clipped_normal_randomized_cell_pit(
             p,
             y,
             predictions["variance_dr_normal"].to_numpy(float),
             uniform,
-            tick_size=tick_size,
+            tick_size=observation_ticks,
         ),
         "dras_normal": clipped_normal_randomized_cell_pit(
             p,
             y,
             predictions["variance_dras_normal"].to_numpy(float),
             uniform,
-            tick_size=tick_size,
+            tick_size=observation_ticks,
         ),
         "mhb": hurdle_beta_randomized_cell_pit(
             p,
@@ -336,7 +379,7 @@ def pit_table(predictions: pd.DataFrame, *, tick_size: float, seed: int = 41731)
             predictions["release"].to_numpy(float),
             predictions["q_mhb"].to_numpy(float),
             uniform,
-            tick_size=tick_size,
+            tick_size=observation_ticks,
         ),
     }
     grid = np.linspace(0.05, 0.95, 19)
@@ -366,12 +409,7 @@ def contract_cluster_bootstrap(
     rng = np.random.default_rng(seed)
     comparisons = [slug for slug in MODEL_NAMES if slug != "mhb"]
     rows: list[dict[str, object]] = []
-    for weighting in ("equal", "volume"):
-        base_weights = (
-            np.ones(len(predictions))
-            if weighting == "equal"
-            else np.maximum(predictions["volume"].to_numpy(float), 0.0)
-        )
+    for weighting, base_weights in _evaluation_weights(predictions).items():
         for metric in ("nll", "is"):
             for other in comparisons:
                 work = pd.DataFrame(
@@ -408,6 +446,53 @@ def contract_cluster_bootstrap(
     return pd.DataFrame(rows)
 
 
+def active_replication_bootstrap(
+    predictions: pd.DataFrame,
+    *,
+    draws: int = 999,
+    seed: int = 44021,
+) -> pd.DataFrame:
+    """Paired cluster intervals for DR-AS versus DR on active updates."""
+
+    active = predictions.loc[predictions["updated"].to_numpy(int) == 1]
+    rng = np.random.default_rng(seed)
+    rows: list[dict[str, object]] = []
+    for weighting, weights in _evaluation_weights(active).items():
+        for metric in ("nll", "is"):
+            work = pd.DataFrame(
+                {
+                    "ticker": active["ticker"].to_numpy(),
+                    "weighted_difference": weights
+                    * (
+                        active[f"{metric}_dr_normal"].to_numpy(float)
+                        - active[f"{metric}_dras_normal"].to_numpy(float)
+                    ),
+                    "weight": weights,
+                }
+            )
+            clusters = work.groupby("ticker", sort=False).sum(numeric_only=True)
+            clusters = clusters.loc[clusters["weight"] > 0]
+            numerator = clusters["weighted_difference"].to_numpy(float)
+            denominator = clusters["weight"].to_numpy(float)
+            indices = rng.integers(0, len(clusters), size=(draws, len(clusters)))
+            boot = numerator[indices].sum(axis=1) / denominator[indices].sum(axis=1)
+            rows.append(
+                {
+                    "model_a": "DR-AS normal",
+                    "model_b": "DR normal",
+                    "regime": "active",
+                    "metric": metric,
+                    "weighting": weighting,
+                    "difference_b_minus_a": float(numerator.sum() / denominator.sum()),
+                    "ci_low": float(np.quantile(boot, 0.025)),
+                    "ci_high": float(np.quantile(boot, 0.975)),
+                    "clusters": len(clusters),
+                    "draws": draws,
+                }
+            )
+    return pd.DataFrame(rows)
+
+
 def subgroup_score_table(predictions: pd.DataFrame) -> pd.DataFrame:
     """Proper-score summaries by update regime and market category.
 
@@ -431,12 +516,7 @@ def subgroup_score_table(predictions: pd.DataFrame) -> pd.DataFrame:
     for category, regime, frame in frames:
         if frame.empty:
             continue
-        for weighting in ("equal", "volume"):
-            weights = (
-                np.ones(len(frame))
-                if weighting == "equal"
-                else np.maximum(frame["volume"].to_numpy(float), 0.0)
-            )
+        for weighting, weights in _evaluation_weights(frame).items():
             total = float(weights.sum())
             if total <= 0:
                 continue
@@ -476,12 +556,7 @@ def hazard_score_table(predictions: pd.DataFrame) -> pd.DataFrame:
         "mhb": "MHB coherent hazard",
     }
     rows: list[dict[str, object]] = []
-    for weighting in ("equal", "volume"):
-        weights = (
-            np.ones(len(predictions))
-            if weighting == "equal"
-            else np.maximum(predictions["volume"].to_numpy(float), 0.0)
-        )
+    for weighting, weights in _evaluation_weights(predictions).items():
         if weights.sum() <= 0:
             continue
         for slug, raw_forecast in forecasts.items():
@@ -501,6 +576,44 @@ def hazard_score_table(predictions: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+def aggregate_score_table(
+    predictions: pd.DataFrame, calibration: pd.DataFrame
+) -> pd.DataFrame:
+    """Pooled scores under each evaluation weighting.
+
+    Computing from observations rather than averaging monthly summaries is
+    essential for contract-balanced weights, which normalize over a contract's
+    full out-of-sample history rather than separately within every month.
+    """
+
+    rows: list[dict[str, object]] = []
+    for weighting, weights in _evaluation_weights(predictions).items():
+        if weights.sum() <= 0:
+            continue
+        for slug, model in MODEL_NAMES.items():
+            diagnostic = calibration.loc[
+                (calibration["model_slug"] == slug)
+                & (calibration["weighting"] == weighting)
+                & np.isclose(calibration["level"], 0.95)
+            ].iloc[0]
+            rows.append(
+                {
+                    "model": model,
+                    "model_slug": slug,
+                    "weighting": weighting,
+                    "negative_log_score": float(
+                        np.average(predictions[f"nll_{slug}"], weights=weights)
+                    ),
+                    "interval_score": float(
+                        np.average(predictions[f"is_{slug}"], weights=weights)
+                    ),
+                    "coverage": diagnostic["coverage"],
+                    "width": diagnostic["width"],
+                }
+            )
+    return pd.DataFrame(rows)
+
+
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--panel", type=Path, required=True)
@@ -508,7 +621,12 @@ def main(argv: list[str] | None = None) -> None:
     parser.add_argument("--max-spread", type=float, default=0.20)
     parser.add_argument("--min-training-rows", type=int, default=1000)
     parser.add_argument("--minimum-contract-forecasts", type=int, default=48)
-    parser.add_argument("--tick-size", type=float, default=0.005)
+    parser.add_argument(
+        "--tick-size",
+        type=float,
+        default=None,
+        help="override market-specific midpoint tick sizes",
+    )
     parser.add_argument(
         "--estimation-weighting",
         choices=("equal", "volume", "log_volume"),
@@ -529,26 +647,16 @@ def main(argv: list[str] | None = None) -> None:
     scores.to_csv(args.output / "monthly_scores.csv", index=False)
     predictions.to_csv(args.output / "predictions.csv.gz", index=False, compression="gzip")
 
-    aggregate = (
-        scores.groupby(["model", "model_slug", "weighting"], sort=False)
-        .apply(
-            lambda group: pd.Series(
-                {
-                    metric: np.average(group[metric], weights=group["weight_sum"])
-                    for metric in ("negative_log_score", "interval_score", "coverage", "width")
-                }
-            ),
-            include_groups=False,
-        )
-        .reset_index()
-    )
-    aggregate.to_csv(args.output / "aggregate_scores.csv", index=False)
     calibration = calibration_table(predictions)
     calibration.to_csv(args.output / "calibration.csv", index=False)
+    aggregate = aggregate_score_table(predictions, calibration)
+    aggregate.to_csv(args.output / "aggregate_scores.csv", index=False)
     pits = pit_table(predictions, tick_size=args.tick_size)
     pits.to_csv(args.output / "pit.csv", index=False)
     bootstrap = contract_cluster_bootstrap(predictions)
     bootstrap.to_csv(args.output / "cluster_bootstrap.csv", index=False)
+    replication = active_replication_bootstrap(predictions)
+    replication.to_csv(args.output / "active_replication_bootstrap.csv", index=False)
     subgroups = subgroup_score_table(predictions)
     subgroups.to_csv(args.output / "subgroup_scores.csv", index=False)
     hazards = hazard_score_table(predictions)
@@ -558,7 +666,7 @@ def main(argv: list[str] | None = None) -> None:
         "max_spread": args.max_spread,
         "min_training_rows": args.min_training_rows,
         "minimum_contract_forecasts": args.minimum_contract_forecasts,
-        "tick_size": args.tick_size,
+        "tick_size": args.tick_size if args.tick_size is not None else "market_specific",
         "estimation_weighting": args.estimation_weighting,
         "months": sorted(scores["month"].unique().tolist()),
         "test_predictions": int(len(predictions)),

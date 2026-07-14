@@ -1,0 +1,181 @@
+category,regime,model,model_slug,weighting,n,weight_sum,negative_log_score,interval_score
+All,all,DR normal,dr_normal,equal,1007560,1007560.0,3.3341969166674836,0.0752910683805549
+All,all,DR-AS normal,dras_normal,equal,1007560,1007560.0,3.203191213540656,0.07497906420585139
+All,all,"Beta, no hurdle",beta_no_hurdle,equal,1007560,1007560.0,3.2554886314784564,0.07512757365226141
+All,all,"Hurdle beta, post-hoc coherence",hurdle_posthoc,equal,1007560,1007560.0,7.023687756746205,0.07868336329294602
+All,all,MHB,mhb,equal,1007560,1007560.0,1.9974381758217234,0.07872353103415344
+All,all,DR normal,dr_normal,volume,1007560,1049530638.51,9.598362489424348,0.24134534526700094
+All,all,DR-AS normal,dras_normal,volume,1007560,1049530638.51,3.1245902143704214,0.1896306420891961
+All,all,"Beta, no hurdle",beta_no_hurdle,volume,1007560,1049530638.51,6.2704044666051235,0.2125263849205499
+All,all,"Hurdle beta, post-hoc coherence",hurdle_posthoc,volume,1007560,1049530638.51,6.032073785740907,0.21477659875107397
+All,all,MHB,mhb,volume,1007560,1049530638.51,5.527139350246399,0.21513662825568167
+All,all,DR normal,dr_normal,contract_balanced,1007560,1404.0,6.672449056220291,0.21975375487505258
+All,all,DR-AS normal,dras_normal,contract_balanced,1007560,1404.0,4.097204232946394,0.21665349121085867
+All,all,"Beta, no hurdle",beta_no_hurdle,contract_balanced,1007560,1404.0,7.438589474584295,0.21661441794569186
+All,all,"Hurdle beta, post-hoc coherence",hurdle_posthoc,contract_balanced,1007560,1404.0,8.878991648002124,0.2246136050766852
+All,all,MHB,mhb,contract_balanced,1007560,1404.0,6.550277546214958,0.22504774412599485
+Economics,all,DR normal,dr_normal,equal,749239,749239.0,4.175461447222729,0.09244917797919541
+Economics,all,DR-AS normal,dras_normal,equal,749239,749239.0,3.993598135552566,0.09168088572868986
+Economics,all,"Beta, no hurdle",beta_no_hurdle,equal,749239,749239.0,4.003144106652828,0.09200861342656846
+Economics,all,"Hurdle beta, post-hoc coherence",hurdle_posthoc,equal,749239,749239.0,8.779600741577328,0.09763086682285133
+Economics,all,MHB,mhb,equal,749239,749239.0,2.506053885400286,0.09769837115373936
+Economics,all,DR normal,dr_normal,volume,749239,108502671.50999999,5.064205702918699,0.19342510859659906
+Economics,all,DR-AS normal,dras_normal,volume,749239,108502671.50999999,3.8702022625722696,0.18570166818357042
+Economics,all,"Beta, no hurdle",beta_no_hurdle,volume,749239,108502671.50999999,4.27674812640985,0.1837876255541282
+Economics,all,"Hurdle beta, post-hoc coherence",hurdle_posthoc,volume,749239,108502671.50999999,5.079476243824068,0.1923448381970179
+Economics,all,MHB,mhb,volume,749239,108502671.50999999,3.49980828819257,0.19333889300933285
+Economics,all,DR normal,dr_normal,contract_balanced,749239,1111.0,7.745727222806424,0.21279447215472821
+Economics,all,DR-AS normal,dras_normal,contract_balanced,749239,1111.0,4.457463173325086,0.20779347594460693
+Economics,all,"Beta, no hurdle",beta_no_hurdle,contract_balanced,749239,1111.0,4.838392725386486,0.2053126084915856
+Economics,all,"Hurdle beta, post-hoc coherence",hurdle_posthoc,contract_balanced,749239,1111.0,6.697420072795701,0.21281640772066096
+Economics,all,MHB,mhb,contract_balanced,749239,1111.0,3.964140664063189,0.21330693867456466
+Politics,all,DR normal,dr_normal,equal,6873,6873.0,2.7291034572464232,0.08270326911907348
+Politics,all,DR-AS normal,dras_normal,equal,6873,6873.0,2.5088667229672517,0.09655164290445561
+Politics,all,"Beta, no hurdle",beta_no_hurdle,equal,6873,6873.0,2.7978169389153997,0.09095669655640354
+Politics,all,"Hurdle beta, post-hoc coherence",hurdle_posthoc,equal,6873,6873.0,2.9920448555398926,0.09745414402382137
+Politics,all,MHB,mhb,equal,6873,6873.0,2.1829310054849027,0.09727811516459528
+Politics,all,DR normal,dr_normal,volume,6873,594416646.0,13.92772493861033,0.2509507950913637
+Politics,all,DR-AS normal,dras_normal,volume,6873,594416646.0,2.9638030897732657,0.15890735519099672
+Politics,all,"Beta, no hurdle",beta_no_hurdle,volume,6873,594416646.0,3.94094814404363,0.19887135090097544
+Politics,all,"Hurdle beta, post-hoc coherence",hurdle_posthoc,volume,6873,594416646.0,3.97201377252328,0.19333598207711444
+Politics,all,MHB,mhb,volume,6873,594416646.0,3.457894284012146,0.19338785728857963
+Politics,all,DR normal,dr_normal,contract_balanced,6873,13.0,4.737081834391045,0.25327202874162913
+Politics,all,DR-AS normal,dras_normal,contract_balanced,6873,13.0,3.1638623066802105,0.25507548698131227
+Politics,all,"Beta, no hurdle",beta_no_hurdle,contract_balanced,6873,13.0,4.678847935081665,0.2524734930504113
+Politics,all,"Hurdle beta, post-hoc coherence",hurdle_posthoc,contract_balanced,6873,13.0,4.819685421322735,0.25031348951751825
+Politics,all,MHB,mhb,contract_balanced,6873,13.0,4.430334383148909,0.25037618238268505
+Sports,all,DR normal,dr_normal,equal,251448,251448.0,0.8440224541063128,0.023962487786349955
+Sports,all,DR-AS normal,dras_normal,equal,251448,251448.0,0.8669960574146585,0.02462302880550824
+Sports,all,"Beta, no hurdle",beta_no_hurdle,equal,251448,251448.0,1.0402112658951754,0.02439451186142506
+Sports,all,"Hurdle beta, post-hoc coherence",hurdle_posthoc,equal,251448,251448.0,1.9017977151396102,0.02171245808309732
+Sports,all,MHB,mhb,equal,251448,251448.0,0.47684696870451526,0.021677080503280363
+Sports,all,DR normal,dr_normal,volume,251448,346611321.0,3.5931432254453144,0.23987347883079485
+Sports,all,DR-AS normal,dras_normal,volume,251448,346611321.0,3.166924792885478,0.24354906940212526
+Sports,all,"Beta, no hurdle",beta_no_hurdle,volume,251448,346611321.0,10.889366849673197,0.2449402473923737
+Sports,all,"Hurdle beta, post-hoc coherence",hurdle_posthoc,volume,251448,346611321.0,9.863146983108786,0.25856791334086615
+Sports,all,MHB,mhb,volume,251448,346611321.0,9.710397254540469,0.2592579338029504
+Sports,all,DR normal,dr_normal,contract_balanced,251448,280.0,2.5036909519581068,0.24581098895367723
+Sports,all,DR-AS normal,dras_normal,contract_balanced,251448,280.0,2.7110819553775882,0.2500248876958222
+Sports,all,"Beta, no hurdle",beta_no_hurdle,contract_balanced,251448,280.0,17.883929575913935,0.25979349768551574
+Sports,all,"Hurdle beta, post-hoc coherence",hurdle_posthoc,contract_balanced,251448,280.0,17.723623794434864,0.27022998995101416
+Sports,all,MHB,mhb,contract_balanced,251448,280.0,16.910125179038076,0.2704576196945734
+All,active,DR normal,dr_normal,equal,174264,174264.0,13.442096750490412,0.26938917174690746
+All,active,DR-AS normal,dras_normal,equal,174264,174264.0,12.565086857398953,0.26226845101252877
+All,active,"Beta, no hurdle",beta_no_hurdle,equal,174264,174264.0,12.484818258220987,0.2632144704073113
+All,active,"Hurdle beta, post-hoc coherence",hurdle_posthoc,equal,174264,174264.0,39.61295109403847,0.34266956374567464
+All,active,MHB,mhb,equal,174264,174264.0,10.479190999192001,0.3392443700059624
+All,active,DR normal,dr_normal,volume,174264,466559148.67,19.492224172178553,0.4411633354657721
+All,active,DR-AS normal,dras_normal,volume,174264,466559148.67,3.9143833674192434,0.2744390261712574
+All,active,"Beta, no hurdle",beta_no_hurdle,volume,174264,466559148.67,7.975940096601858,0.34263230555306073
+All,active,"Hurdle beta, post-hoc coherence",hurdle_posthoc,volume,174264,466559148.67,9.456408260866123,0.33776132651807805
+All,active,MHB,mhb,volume,174264,466559148.67,8.324431672631924,0.33850099912963866
+All,active,DR normal,dr_normal,contract_balanced,174264,1335.0,18.67540884401305,0.44658195938275874
+All,active,DR-AS normal,dras_normal,contract_balanced,174264,1335.0,12.498002621685956,0.4066292452720035
+All,active,"Beta, no hurdle",beta_no_hurdle,contract_balanced,174264,1335.0,15.525400149781152,0.41333676380719575
+All,active,"Hurdle beta, post-hoc coherence",hurdle_posthoc,contract_balanced,174264,1335.0,20.16876591615225,0.43775684804179943
+All,active,MHB,mhb,contract_balanced,174264,1335.0,11.51150995927775,0.4369431783129524
+Economics,active,DR normal,dr_normal,equal,162537,162537.0,14.004593683693237,0.27324739194403364
+Economics,active,DR-AS normal,dras_normal,equal,162537,162537.0,13.100946471537263,0.26567235187114724
+Economics,active,"Beta, no hurdle",beta_no_hurdle,equal,162537,162537.0,12.912579557489929,0.2666915162996274
+Economics,active,"Hurdle beta, post-hoc coherence",hurdle_posthoc,equal,162537,162537.0,39.66086598242084,0.34446812684322636
+Economics,active,MHB,mhb,equal,162537,162537.0,10.66492967618686,0.3408599714355106
+Economics,active,DR normal,dr_normal,volume,162537,60136911.67,7.434511679027478,0.27701672838246244
+Economics,active,DR-AS normal,dras_normal,volume,162537,60136911.67,4.995731456732804,0.2455221006831019
+Economics,active,"Beta, no hurdle",beta_no_hurdle,volume,162537,60136911.67,5.6120282611512975,0.24588981308669028
+Economics,active,"Hurdle beta, post-hoc coherence",hurdle_posthoc,volume,162537,60136911.67,8.530677311240542,0.261351792601542
+Economics,active,MHB,mhb,volume,162537,60136911.67,5.691508885080648,0.2627323654650187
+Economics,active,DR normal,dr_normal,contract_balanced,162537,1111.0,18.488165978445487,0.38459976433241116
+Economics,active,DR-AS normal,dras_normal,contract_balanced,162537,1111.0,11.183645665401471,0.3386663378066439
+Economics,active,"Beta, no hurdle",beta_no_hurdle,contract_balanced,162537,1111.0,10.940599179906009,0.342787269700958
+Economics,active,"Hurdle beta, post-hoc coherence",hurdle_posthoc,contract_balanced,162537,1111.0,18.160496576051834,0.36469258634700413
+Economics,active,MHB,mhb,contract_balanced,162537,1111.0,8.609773424839043,0.36365879112665156
+Politics,active,DR normal,dr_normal,equal,2260,2260.0,5.434047795930109,0.1693408234423401
+Politics,active,DR-AS normal,dras_normal,equal,2260,2260.0,3.84409426806812,0.17141931780133776
+Politics,active,"Beta, no hurdle",beta_no_hurdle,equal,2260,2260.0,4.433439678532604,0.16920871384528696
+Politics,active,"Hurdle beta, post-hoc coherence",hurdle_posthoc,equal,2260,2260.0,7.747333602741374,0.20299085549538534
+Politics,active,MHB,mhb,equal,2260,2260.0,5.278964708818257,0.20241549773265
+Politics,active,DR normal,dr_normal,volume,2260,311381603.0,25.407999461622698,0.44606602866085493
+Politics,active,DR-AS normal,dras_normal,volume,2260,311381603.0,3.3142919823337755,0.20674866937889286
+Politics,active,"Beta, no hurdle",beta_no_hurdle,volume,2260,311381603.0,5.322853137815653,0.3057943347219271
+Politics,active,"Hurdle beta, post-hoc coherence",hurdle_posthoc,volume,2260,311381603.0,6.614738465890963,0.2901997673032165
+Politics,active,MHB,mhb,volume,2260,311381603.0,5.629549779415399,0.29036358290360725
+Politics,active,DR normal,dr_normal,contract_balanced,2260,12.0,7.827680830332511,0.3314915707594524
+Politics,active,DR-AS normal,dras_normal,contract_balanced,2260,12.0,3.4588792276329663,0.2966519428717175
+Politics,active,"Beta, no hurdle",beta_no_hurdle,contract_balanced,2260,12.0,4.399135639071333,0.3078282459720654
+Politics,active,"Hurdle beta, post-hoc coherence",hurdle_posthoc,contract_balanced,2260,12.0,5.686980470298432,0.30363421434637766
+Politics,active,MHB,mhb,contract_balanced,2260,12.0,5.110777926756115,0.3037441424916271
+Sports,active,DR normal,dr_normal,equal,9467,9467.0,5.69641454972127,0.2270321136490968
+Sports,active,DR-AS normal,dras_normal,equal,9467,9467.0,5.44693212503272,0.22551543603418525
+Sports,active,"Beta, no hurdle",beta_no_hurdle,equal,9467,9467.0,7.06272860899946,0.22595920491991162
+Sports,active,"Hurdle beta, post-hoc coherence",hurdle_posthoc,equal,9467,9467.0,46.39739741466025,0.3451350576147879
+Sports,active,MHB,mhb,equal,9467,9467.0,8.531700143961318,0.3441707713773806
+Sports,active,DR normal,dr_normal,volume,9467,95040634.0,7.739882521427079,0.5289643232516609
+Sports,active,DR-AS normal,dras_normal,volume,9467,95040634.0,5.196240166720799,0.5145100930319604
+Sports,active,"Beta, no hurdle",beta_no_hurdle,volume,9467,95040634.0,18.164012151859836,0.524538300970257
+Sports,active,"Hurdle beta, post-hoc coherence",hurdle_posthoc,volume,9467,95040634.0,19.352326003837685,0.5419353426698181
+Sports,active,MHB,mhb,volume,9467,95040634.0,18.819652999904825,0.54415616614784
+Sports,active,DR normal,dr_normal,contract_balanced,9467,212.0,20.270689786511777,0.7779182960073613
+Sports,active,DR-AS normal,dras_normal,contract_balanced,9467,212.0,19.897625542255287,0.7690184802852956
+Sports,active,"Beta, no hurdle",beta_no_hurdle,contract_balanced,9467,212.0,40.18214095949722,0.7890282268546092
+Sports,active,"Hurdle beta, post-hoc coherence",hurdle_posthoc,contract_balanced,9467,212.0,31.51295771899097,0.8282467836420949
+Sports,active,MHB,mhb,contract_balanced,9467,212.0,27.080557478861085,0.8285344169631228
+All,inactive,DR normal,dr_normal,equal,833296,833296.0,1.2203705492766423,0.03470007564203935
+All,inactive,DR-AS normal,dras_normal,equal,833296,833296.0,1.2453738443449296,0.03581195227626236
+All,inactive,"Beta, no hurdle",beta_no_hurdle,equal,833296,833296.0,1.3253942855621672,0.035793681522547575
+All,inactive,"Hurdle beta, post-hoc coherence",hurdle_posthoc,equal,833296,833296.0,0.20841996929744724,0.02347694056237452
+All,inactive,MHB,mhb,equal,833296,833296.0,0.223681702717571,0.024241806073775227
+All,inactive,DR normal,dr_normal,volume,833296,582971489.84,1.6801850755829832,0.08142858600716858
+All,inactive,DR-AS normal,dras_normal,volume,833296,582971489.84,2.4925091820492926,0.12175746446902702
+All,inactive,"Beta, no hurdle",beta_no_hurdle,volume,833296,582971489.84,4.905443631597528,0.10840103981338021
+All,inactive,"Hurdle beta, post-hoc coherence",hurdle_posthoc,volume,833296,582971489.84,3.2915374039116028,0.11635043059980925
+All,inactive,MHB,mhb,volume,833296,582971489.84,3.2884324027222402,0.11640662712481956
+All,inactive,DR normal,dr_normal,contract_balanced,833296,1404.0,2.086369454851138,0.11547038155335503
+All,inactive,DR-AS normal,dras_normal,contract_balanced,833296,1404.0,2.5628284887941986,0.1468291177640379
+All,inactive,"Beta, no hurdle",beta_no_hurdle,contract_balanced,833296,1404.0,5.768614147497993,0.14173687197779766
+All,inactive,"Hurdle beta, post-hoc coherence",hurdle_posthoc,contract_balanced,833296,1404.0,3.989640003149522,0.14605751730187685
+All,inactive,MHB,mhb,contract_balanced,833296,1404.0,3.98775323275,0.14698962898542703
+Economics,inactive,DR normal,dr_normal,equal,586702,586702.0,1.4524476066031193,0.0423617412511752
+Economics,inactive,DR-AS normal,dras_normal,equal,586702,586702.0,1.470543711865677,0.04347915651625051
+Economics,inactive,"Beta, no hurdle",beta_no_hurdle,equal,586702,586702.0,1.5349184829584996,0.04361533202599648
+Economics,inactive,"Hurdle beta, post-hoc coherence",hurdle_posthoc,equal,586702,586702.0,0.22440882395819226,0.02924830168427724
+Economics,inactive,MHB,mhb,equal,586702,586702.0,0.2457595717502948,0.030334092482457782
+Economics,inactive,DR normal,dr_normal,volume,586702,48365759.84,2.117019892385037,0.08948914497182708
+Economics,inactive,DR-AS normal,dras_normal,volume,586702,48365759.84,2.4707442584976578,0.11132227091603596
+Economics,inactive,"Beta, no hurdle",beta_no_hurdle,volume,586702,48365759.84,2.6164904610016477,0.106571144752129
+Economics,inactive,"Hurdle beta, post-hoc coherence",hurdle_posthoc,volume,586702,48365759.84,0.7883294814612367,0.10654312360866333
+Economics,inactive,MHB,mhb,volume,586702,48365759.84,0.7746964396831593,0.10705659046002251
+Economics,inactive,DR normal,dr_normal,contract_balanced,586702,1111.0,2.051958730666442,0.09100068147839219
+Economics,inactive,DR-AS normal,dras_normal,contract_balanced,586702,1111.0,2.568075212104961,0.12814113900880647
+Economics,inactive,"Beta, no hurdle",beta_no_hurdle,contract_balanced,586702,1111.0,3.488691743573481,0.12011331554555078
+Economics,inactive,"Hurdle beta, post-hoc coherence",hurdle_posthoc,contract_balanced,586702,1111.0,1.6847754308572502,0.12348318815574716
+Economics,inactive,MHB,mhb,contract_balanced,586702,1111.0,1.6780922122059656,0.12456318453983255
+Politics,inactive,DR normal,dr_normal,equal,4613,4613.0,1.4038976897577766,0.04025781653494544
+Politics,inactive,DR-AS normal,dras_normal,equal,4613,4613.0,1.8547123219423292,0.05987248719950144
+Politics,inactive,"Beta, no hurdle",beta_no_hurdle,equal,4613,4613.0,1.9964929867075345,0.052619484531067184
+Politics,inactive,"Hurdle beta, post-hoc coherence",hurdle_posthoc,equal,4613,4613.0,0.6623347821223007,0.04574962030265627
+Politics,inactive,MHB,mhb,equal,4613,4613.0,0.6661228178557285,0.04576923057673409
+Politics,inactive,DR normal,dr_normal,volume,4613,283035043.0,1.2976765673362036,0.036294356953462996
+Politics,inactive,DR-AS normal,dras_normal,volume,4613,283035043.0,2.5782119910795744,0.10627463189441984
+Politics,inactive,"Beta, no hurdle",beta_no_hurdle,volume,4613,283035043.0,2.420642433508568,0.08123980341902282
+Politics,inactive,"Hurdle beta, post-hoc coherence",hurdle_posthoc,volume,4613,283035043.0,1.0646145947171872,0.08677108326933189
+Politics,inactive,MHB,mhb,volume,4613,283035043.0,1.0687428836944692,0.08669980702444524
+Politics,inactive,DR normal,dr_normal,contract_balanced,4613,12.999999999999998,2.0418992024933864,0.07925448180149464
+Politics,inactive,DR-AS normal,dras_normal,contract_balanced,4613,12.999999999999998,2.819010745278777,0.14782655237390455
+Politics,inactive,"Beta, no hurdle",beta_no_hurdle,contract_balanced,4613,12.999999999999998,9.121425746129786,0.1292654324490727
+Politics,inactive,"Hurdle beta, post-hoc coherence",hurdle_posthoc,contract_balanced,4613,12.999999999999998,7.239420393252882,0.13664067931741267
+Politics,inactive,MHB,mhb,contract_balanced,4613,12.999999999999998,7.223695768391439,0.13670747098082303
+Sports,inactive,DR normal,dr_normal,equal,241981,241981.0,0.6541827726057536,0.016017813832433638
+Sports,inactive,DR-AS normal,dras_normal,equal,241981,241981.0,0.6878156475802493,0.0167635339723028
+Sports,inactive,"Beta, no hurdle",beta_no_hurdle,equal,241981,241981.0,0.8045928839264742,0.016508715252663658
+Sports,inactive,"Hurdle beta, post-hoc coherence",hurdle_posthoc,equal,241981,241981.0,0.16100053538019976,0.009059226012122685
+Sports,inactive,MHB,mhb,equal,241981,241981.0,0.1617177023151864,0.009060190038718656
+Sports,inactive,DR normal,dr_normal,volume,241981,251570687.0,2.026550803956952,0.13065814271592208
+Sports,inactive,DR-AS normal,dras_normal,volume,241981,251570687.0,2.4002718015723215,0.14118297984627615
+Sports,inactive,"Beta, no hurdle",beta_no_hurdle,volume,241981,251570687.0,8.14108599911075,0.1393111830761165
+Sports,inactive,"Hurdle beta, post-hoc coherence",hurdle_posthoc,volume,241981,251570687.0,6.278239691149234,0.15151482039298303
+Sports,inactive,MHB,mhb,volume,241981,251570687.0,6.269020790407463,0.1516265203404687
+Sports,inactive,DR normal,dr_normal,contract_balanced,241981,280.0,2.2249709828863105,0.21424410826784748
+Sports,inactive,DR-AS normal,dras_normal,contract_balanced,241981,280.0,2.530116064035068,0.22093403828951608
+Sports,inactive,"Beta, no hurdle",beta_no_hurdle,contract_balanced,241981,280.0,14.659354290276278,0.22811508594243954
+Sports,inactive,"Hurdle beta, post-hoc coherence",hurdle_posthoc,contract_balanced,241981,280.0,12.984130698668704,0.2360664407845487
+Sports,inactive,MHB,mhb,contract_balanced,241981,280.0,13.001918021539582,0.23645194267512448

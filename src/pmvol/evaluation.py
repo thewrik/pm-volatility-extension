@@ -31,11 +31,15 @@ def _coherent_beta_parameters(
     return p, r, q, alpha, beta, terminal
 
 
-def _cells(realized: np.ndarray, tick_size: float) -> tuple[np.ndarray, np.ndarray]:
-    if tick_size <= 0:
+def _cells(
+    realized: np.ndarray, tick_size: np.ndarray | float
+) -> tuple[np.ndarray, np.ndarray]:
+    y, tick = np.broadcast_arrays(
+        np.asarray(realized, dtype=float), np.asarray(tick_size, dtype=float)
+    )
+    if np.any(tick <= 0):
         raise ValueError("tick_size must be positive")
-    y = np.asarray(realized, dtype=float)
-    return np.maximum(0.0, y - tick_size / 2.0), np.minimum(1.0, y + tick_size / 2.0)
+    return np.maximum(0.0, y - tick / 2.0), np.minimum(1.0, y + tick / 2.0)
 
 
 def hurdle_beta_cell_probability(
@@ -44,7 +48,7 @@ def hurdle_beta_cell_probability(
     release: np.ndarray,
     hazard: np.ndarray,
     *,
-    tick_size: float = 0.005,
+    tick_size: np.ndarray | float = 0.005,
 ) -> np.ndarray:
     """Rounding-aware cell probabilities for the hurdle-beta forecast."""
 
@@ -71,7 +75,7 @@ def clipped_normal_cell_probability(
     realized: np.ndarray,
     variance: np.ndarray,
     *,
-    tick_size: float = 0.005,
+    tick_size: np.ndarray | float = 0.005,
 ) -> np.ndarray:
     """Cell probability after clipping a latent Gaussian price to ``[0,1]``."""
 
@@ -95,7 +99,7 @@ def hurdle_beta_randomized_cell_pit(
     hazard: np.ndarray,
     uniform: np.ndarray,
     *,
-    tick_size: float = 0.005,
+    tick_size: np.ndarray | float = 0.005,
 ) -> np.ndarray:
     """Randomized PIT for the observed lattice cell under the mixed law."""
 
@@ -124,7 +128,7 @@ def clipped_normal_randomized_cell_pit(
     variance: np.ndarray,
     uniform: np.ndarray,
     *,
-    tick_size: float = 0.005,
+    tick_size: np.ndarray | float = 0.005,
 ) -> np.ndarray:
     """Randomized PIT for a lattice cell under a clipped latent Gaussian."""
 

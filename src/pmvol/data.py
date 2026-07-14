@@ -143,6 +143,27 @@ def _known_deadline(market: dict[str, Any]) -> datetime | None:
     return _parse_time(market.get("close_time"))
 
 
+def _quote_step(market: dict[str, Any], price: float) -> float:
+    """Return the exchange tick at a quote price from market metadata."""
+
+    matches = []
+    for price_range in market.get("price_ranges") or []:
+        start = _number(price_range.get("start"))
+        end = _number(price_range.get("end"))
+        step = _number(price_range.get("step"))
+        if np.isfinite(start) and np.isfinite(end) and np.isfinite(step):
+            if start <= price <= end and step > 0:
+                matches.append(step)
+    if matches:
+        return float(min(matches))
+    structure = str(market.get("price_level_structure") or "linear_cent")
+    if structure == "deci_cent":
+        return 0.001
+    if structure == "tapered_deci_cent" and (price <= 0.10 or price >= 0.90):
+        return 0.001
+    return 0.01
+
+
 def select_market_jobs(config: dict[str, Any], client: KalshiClient) -> list[MarketJob]:
     global_start = _parse_time(config["start"])
     global_end = _parse_time(config["end"])
@@ -268,6 +289,7 @@ def candles_to_frame(job: MarketJob, candles: list[dict[str, Any]]) -> pd.DataFr
         price_fields = candle.get("price", {})
         timestamp = datetime.fromtimestamp(int(candle["end_period_ts"]), tz=UTC)
         quote_valid = np.isfinite(bid) and np.isfinite(ask) and 0 <= bid <= ask <= 1
+        midpoint_tick = min(_quote_step(job.market, bid), _quote_step(job.market, ask)) / 2.0
         rows.append(
             {
                 "ticker": job.ticker,
@@ -279,6 +301,8 @@ def candles_to_frame(job: MarketJob, candles: list[dict[str, Any]]) -> pd.DataFr
                 "bid": bid,
                 "ask": ask,
                 "spread": ask - bid if quote_valid else np.nan,
+                "tick_size": midpoint_tick if quote_valid else np.nan,
+                "price_level_structure": job.market.get("price_level_structure", "linear_cent"),
                 "last_price": _number(price_fields.get("close")),
                 "previous_last_price": _number(price_fields.get("previous")),
                 "volume": _number(candle.get("volume")),
@@ -298,6 +322,7 @@ def finalize_panel(frame: pd.DataFrame, period_minutes: int = 60) -> pd.DataFram
     group = panel.groupby("ticker", sort=False, observed=True)
     panel["next_timestamp"] = group["timestamp"].shift(-1)
     panel["price_next"] = group["price"].shift(-1)
+    panel["tick_size_next"] = group["tick_size"].shift(-1)
     expected_seconds = period_minutes * 60
     panel["horizon_seconds"] = (
         panel["next_timestamp"] - panel["timestamp"]
@@ -312,6 +337,7 @@ def finalize_panel(frame: pd.DataFrame, period_minutes: int = 60) -> pd.DataFram
         & panel["price"].between(0, 1, inclusive="neither")
         & panel["price_next"].between(0, 1, inclusive="both")
         & panel["spread"].between(0, 1, inclusive="both")
+        & (panel["tick_size_next"] > 0)
         # The forecast horizon must end no later than the scheduled deadline;
         # otherwise the finite deadline clock would mechanically release all
         # uncertainty even though the API may continue showing stale quotes.

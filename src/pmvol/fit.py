@@ -40,6 +40,7 @@ def fit_order_flow_k(
     finite_clock: bool,
     active_only: bool,
     weighting: str = "equal",
+    initial_k: float | None = None,
 ) -> float:
     """Fit the nonnegative DR-AS scale by Gaussian quasi-likelihood."""
 
@@ -63,10 +64,21 @@ def fit_order_flow_k(
         terms = np.log(variance) + innovation2 / variance
         return float(np.average(terms, weights=weights))
 
-    result = minimize_scalar(objective, bounds=(-20.0, 20.0), method="bounded")
+    if initial_k is None:
+        result = minimize_scalar(objective, bounds=(-20.0, 20.0), method="bounded")
+        fitted_log_k = float(result.x)
+    else:
+        result = minimize(
+            lambda value: objective(float(value[0])),
+            np.array([np.log(np.clip(initial_k, np.exp(-20.0), np.exp(20.0)))]),
+            method="L-BFGS-B",
+            bounds=[(-20.0, 20.0)],
+            options={"maxiter": 100, "ftol": 1e-11, "gtol": 1e-7},
+        )
+        fitted_log_k = float(result.x[0])
     if not result.success or not np.isfinite(result.fun):
         raise RuntimeError(f"K optimization failed: {result}")
-    return float(np.exp(result.x))
+    return float(np.exp(fitted_log_k))
 
 
 def hazard_raw_features(frame: pd.DataFrame) -> np.ndarray:
@@ -114,6 +126,7 @@ def fit_hazard(
     constrained: bool,
     weighting: str = "equal",
     l2: float = 1e-4,
+    initial_model: HazardModel | None = None,
 ) -> HazardModel:
     """Fit a Bernoulli update model, optionally enforcing ``q >= release``."""
 
@@ -133,8 +146,20 @@ def fit_hazard(
         intercept = float(logit(np.clip(residual_rate, 1e-4, 1 - 1e-4)))
     else:
         intercept = float(logit(np.clip(z.mean(), 1e-4, 1 - 1e-4)))
-    initial = np.zeros(x.shape[1])
-    initial[0] = intercept
+    cold_initial = np.zeros(x.shape[1])
+    cold_initial[0] = intercept
+    if initial_model is None or initial_model.constrained != constrained:
+        initial = cold_initial
+    else:
+        previous_raw_slope = initial_model.coefficient[1:] / initial_model.feature_scale
+        previous_raw_intercept = float(
+            initial_model.coefficient[0]
+            - previous_raw_slope @ initial_model.feature_mean
+        )
+        initial = np.r_[
+            previous_raw_intercept + previous_raw_slope @ mean,
+            previous_raw_slope * scale,
+        ]
 
     def objective(coef: np.ndarray) -> tuple[float, np.ndarray]:
         eta = x @ coef
@@ -160,7 +185,14 @@ def fit_hazard(
         jac=True,
         options={"maxiter": 500, "ftol": 1e-11, "gtol": 1e-7},
     )
+    if (not result.success or not np.all(np.isfinite(result.x))) and initial_model is not None:
+        result = minimize(
+            lambda coef: objective(coef),
+            cold_initial,
+            method="L-BFGS-B",
+            jac=True,
+            options={"maxiter": 500, "ftol": 1e-11, "gtol": 1e-7},
+        )
     if not result.success or not np.all(np.isfinite(result.x)):
         raise RuntimeError(f"hazard optimization failed: {result.message}")
     return HazardModel(result.x, mean, scale, constrained)
-
