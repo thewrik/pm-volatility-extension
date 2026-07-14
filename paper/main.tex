@@ -1,0 +1,434 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,booktabs,graphicx,microtype,natbib}
+\usepackage[hidelinks]{hyperref}
+\usepackage{xcolor}
+\usepackage{enumitem}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}{Proposition}
+\newtheorem{corollary}{Corollary}
+\newtheorem{remark}{Remark}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Pp}{\mathbb P}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\1}{\mathbb I}
+\newcommand{\F}{\mathcal F}
+\newcommand{\given}{\,\middle|\,}
+
+\title{When Nothing Happens:\\Martingale-Coherent Distribution Forecasts for Prediction Markets}
+\author{Anonymous research artifact}
+\date{July 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Prediction-market prices often remain unchanged for many observation periods and
+then move abruptly. Existing structural volatility models explain the size of
+active moves but do not provide an unconditional predictive distribution for
+the joint incidence and magnitude of price updates. We derive a restriction
+that couples these two margins. If a binary-claim price is a bounded martingale,
+the fraction of remaining Bernoulli uncertainty released over one period,
+$r_t=\Var(p_{t+1}\mid\F_t)/[p_t(1-p_t)]$, cannot exceed the update probability
+$q_t=\Pp(p_{t+1}\ne p_t\mid\F_t)$. We construct a martingale-coherent
+hurdle-beta distribution that realizes every feasible pair $0<r_t<q_t\le1$,
+contains a point mass at no change, respects the $[0,1]$ price boundary, and has
+closed-form quantiles. We also replace the locally additive DR-AS variance with
+a finite-step information-clock aggregation that cannot spend more than the
+remaining uncertainty and agrees with DR-AS to first order. A public-API
+replication evaluates the model in monthly expanding windows using proper
+mixed-distribution scores, multi-level coverage, and contract-cluster
+inference. Empirical results are reported only from the locked pipeline and are
+not asserted in this draft until the full backtest and robustness suite finish.
+\end{abstract}
+
+\section{Introduction}
+
+A prediction-market price is both a traded price and a probability. This dual
+role makes the standard volatility question unusually structured. The price is
+bounded, its terminal payoff is binary, and its resolution date is known. At
+the same time, the observed quote can remain exactly unchanged for hours even
+while uncertainty persists. A useful forecast must therefore answer two
+questions: will the displayed probability update, and how far can it move if it
+does?
+
+\citet{xi2026volatility} derive a structural variance model with a
+Wright-Fisher deadline-resolution channel and a Glosten-Milgrom order-flow
+channel. Their DR-AS specification outperforms plain ARCH and GARCH models on a
+large Kalshi panel, especially after residual GARCH dynamics are added. The
+headline exercise deliberately conditions on active price updates. The paper's
+conclusion identifies a joint update-hazard and move-size model as a natural
+next step.
+
+This paper develops that step as a distributional rather than merely
+regression extension. The central observation is that update incidence and
+conditional variance cannot be chosen independently once the price is required
+to remain a bounded martingale. Let $q_t$ be the probability of any change and
+let $r_t$ be unconditional one-period variance divided by remaining Bernoulli
+uncertainty. We prove $r_t\le q_t$. The inequality is sharp, easy to test, and
+economically interpretable: rare updates can release only a correspondingly
+limited share of uncertainty unless an active update is nearly a full
+resolution to zero or one.
+
+The paper makes four contributions.
+
+\begin{enumerate}[leftmargin=*]
+\item It gives a necessary and sharp coherence restriction linking the
+extensive margin of information arrival to the intensive margin of belief
+revision.
+\item It constructs a hurdle-beta predictive law with exact martingale mean,
+exact unconditional variance, an explicit no-update atom, bounded support, and
+closed-form central intervals.
+\item It derives a finite-step information-clock version of DR-AS. The pure
+deadline component in fact has the exact normalized variance $\Delta/\tau$;
+order-flow intensity enters through an exponential clock map that preserves the
+total variance budget and nests additive DR-AS locally.
+\item It evaluates full predictive distributions on the unfiltered hourly
+panel using scores that are proper for mixed and price-lattice observations,
+rather than evaluating a variance proxy only after zero moves are removed.
+\end{enumerate}
+
+The construction differs from general zero-inflated price models
+\citep{catania2019dynamic,holy2023intraday} because its two margins are coupled
+by the martingale and binary-payoff structure. It differs from logit
+jump-diffusion kernels for prediction markets \citep{dalen2025toward} because it
+targets the observed no-update atom and an unconditional short-horizon density,
+not a continuous-time derivative-pricing surface. Recent local-volatility work
+for event-market martingales \citep{xu2026local} characterizes admissible
+boundary behavior and information clocks; the result here instead identifies a
+discrete-observation inequality between update incidence and variance release.
+
+\section{Structural benchmark and forecasting target}
+
+Let $\Theta\in\{0,1\}$ be the settlement payoff at time $T$. Under the maintained
+risk-neutral interpretation,
+\begin{equation}
+p_t=\E[\Theta\mid\F_t]
+\end{equation}
+is a bounded martingale with $p_T=\Theta$. For an observation step of length
+$\Delta$ and time to resolution $\tau=T-t$, the DR-AS benchmark of
+\citet{xi2026volatility} is
+\begin{equation}
+h^2_{\mathrm{DR-AS}}
+=\left[\frac{p_t(1-p_t)}{\tau}
++K\nu(V_t)\frac{s_t^2}{4}\right]\Delta,
+\label{eq:dras}
+\end{equation}
+where $s_t$ is the bid-ask spread, $V_t$ is volume, $\nu$ is a concave activity
+transform, and $K\ge0$ is fitted.
+
+The benchmark maps $h$ to a symmetric normal-reference interval around $p_t$
+and clips that interval to $[0,1]$. This provides a common scoring rule for scale
+forecasts but is not the transition law of either structural channel. More
+importantly for the present paper, conditioning estimation and headline
+evaluation on $p_{t+\Delta}\ne p_t$ changes the variance object. We instead
+forecast the full law of $p_{t+\Delta}$ on the unfiltered panel.
+
+\section{A coherence law for update incidence}
+
+Fix a forecast origin and suppress time subscripts. Write $p\in(0,1)$ for the
+current price, $Y\in[0,1]$ for the next price, and
+\begin{equation}
+q=\Pp(Y\ne p\mid\F),\qquad
+r=\frac{\Var(Y\mid\F)}{p(1-p)}.
+\end{equation}
+
+\begin{theorem}[Update-variance coherence]
+\label{thm:coherence}
+If $Y\in[0,1]$ almost surely and $\E[Y\mid\F]=p$, then
+\begin{equation}
+0\le r\le q\le1.
+\label{eq:coherence}
+\end{equation}
+If $q>0$, equality $r=q$ holds if and only if the active-update distribution is
+supported on $\{0,1\}$ almost surely. If $r=0$, then $q=0$ under the definition
+$q=\Pp(Y\ne p\mid\F)$.
+\end{theorem}
+
+\begin{proof}
+Let $A=\{Y\ne p\}$. Since $Y-p=0$ on $A^c$ and $\E[Y-p\mid\F]=0$,
+$\E[Y\mid A,\F]=p$ whenever $q>0$. Hence
+\begin{align}
+\Var(Y\mid\F)
+&=q\E[(Y-p)^2\mid A,\F]\\
+&=q\Var(Y\mid A,\F)\\
+&\le q\,p(1-p),
+\end{align}
+where the last line is the Bernoulli variance bound for a random variable in
+$[0,1]$ with mean $p$: $\E[Y^2\mid A,\F]\le\E[Y\mid A,\F]=p$. Equality in that
+bound requires $Y^2=Y$ almost surely conditional on $A$, which is equivalent to
+$Y\in\{0,1\}$. If $r=0$, then $Y=p$ almost surely, so $q=0$.
+\end{proof}
+
+The result does not rely on a diffusion, Gaussian shocks, or a particular
+market microstructure model. It is a consequence of three economically basic
+restrictions: bounded prices, the martingale mean, and an observed atom at no
+change. It also supplies a diagnostic. A separately estimated update hazard
+below a structural variance release cannot correspond to any bounded
+martingale transition with those moments.
+
+\section{Finite-step structural variance release}
+
+The neutral Wright-Fisher diffusion in information time $u$ is
+\begin{equation}
+d\widetilde p_u=\sqrt{\widetilde p_u(1-\widetilde p_u)}\,dB_u.
+\end{equation}
+Its generator applied to $g(p)=p(1-p)$ gives $\mathcal Lg=-g$. Therefore
+\begin{equation}
+\E[\widetilde p_u(1-\widetilde p_u)\mid\widetilde p_0=p]
+=p(1-p)e^{-u}
+\end{equation}
+and, using the martingale mean,
+\begin{equation}
+\Var(\widetilde p_u\mid\widetilde p_0=p)
+=p(1-p)(1-e^{-u}).
+\label{eq:wfexact}
+\end{equation}
+
+The deadline clock has instantaneous rate $1/(T-t)$. Over a calendar step
+$[t,t+\Delta]$ with $\tau>\Delta$, its integrated information time is
+\begin{equation}
+\Lambda_{\mathrm{DR}}
+=\int_t^{t+\Delta}\frac{ds}{T-s}
+=\log\left(\frac{\tau}{\tau-\Delta}\right).
+\end{equation}
+Combining this expression with Equation~\eqref{eq:wfexact} yields
+\begin{equation}
+r_{\mathrm{DR}}=1-e^{-\Lambda_{\mathrm{DR}}}=\frac{\Delta}{\tau}.
+\label{eq:drexact}
+\end{equation}
+Thus, under the maintained Wright-Fisher clock, the pure deadline variance in
+Equation~\eqref{eq:dras} is exact for a finite step ending before the deadline,
+even though it can also be obtained by an Euler argument.
+
+To combine order flow without violating the remaining-uncertainty budget,
+define its variance-equivalent local clock intensity
+\begin{equation}
+\lambda_{\mathrm{AS}}
+=K\nu(V_t)\frac{s_t^2}{4p_t(1-p_t)}.
+\end{equation}
+We propose the finite-step release
+\begin{equation}
+r_t(K)
+=1-\exp\left\{-\Lambda_{\mathrm{DR}}
+-\lambda_{\mathrm{AS}}\Delta\right\}.
+\label{eq:release}
+\end{equation}
+It lies in $[0,1]$ by construction. A small-step expansion gives
+\begin{equation}
+r_t(K)p_t(1-p_t)
+=\left[\frac{p_t(1-p_t)}{\tau}
++K\nu(V_t)\frac{s_t^2}{4}\right]\Delta+O(\Delta^2),
+\end{equation}
+so the model nests DR-AS locally while introducing the finite-horizon
+interaction required by a single variance budget. The order-flow clock is a
+variance-equivalent reduced form; it is not claimed to turn the exact
+Glosten-Milgrom jump distribution into a Wright-Fisher diffusion.
+
+\section{A martingale-coherent hurdle distribution}
+
+For any $0<r<q\le1$, set
+\begin{equation}
+\kappa=\frac{q}{r}-1
+\end{equation}
+and define
+\begin{equation}
+Y\mid\F\sim(1-q)\delta_p
++q\,\mathrm{Beta}\bigl(p\kappa,(1-p)\kappa\bigr).
+\label{eq:mhb}
+\end{equation}
+
+\begin{proposition}[Sharp construction]
+The law in Equation~\eqref{eq:mhb} has
+\begin{equation}
+\E[Y\mid\F]=p,\qquad
+\Var(Y\mid\F)=r p(1-p),\qquad
+\Pp(Y\ne p\mid\F)=q.
+\end{equation}
+For $q=r$, its weak endpoint limit replaces the active beta component by a
+Bernoulli$(p)$ law on $\{0,1\}$. Together with the degenerate $r=q=0$ case, the
+construction realizes every feasible pair in Theorem~\ref{thm:coherence}.
+\end{proposition}
+
+\begin{proof}
+The active beta component has mean $p$ and variance
+$p(1-p)/(\kappa+1)=(r/q)p(1-p)$. Mixture with a point mass at the same mean
+preserves the mean and multiplies active variance by $q$. A continuous beta draw
+equals $p$ with probability zero, giving update probability $q$. As
+$\kappa\downarrow0$, the beta law converges weakly to mass $1-p$ at zero and
+mass $p$ at one.
+\end{proof}
+
+The beta component is a parsimonious moment-matching kernel. It is not the exact
+finite-time Wright-Fisher transition density, which has nontrivial absorption
+behavior and is difficult to express analytically \citep{roa2022smalltime}.
+This distinction is important: our theoretical claim concerns exact moments and
+the update atom, not exact recovery of the diffusion transition law.
+
+We parameterize the hazard so coherence holds at every forecast origin:
+\begin{equation}
+q_t=r_t+(1-r_t)\operatorname{logit}^{-1}(x_t'\gamma),
+\label{eq:hazard}
+\end{equation}
+where $x_t$ contains only forecast-origin states: log volume, log open interest,
+log time to resolution, log spread, $p_t(1-p_t)$, and the lagged update
+indicator. Equation~\eqref{eq:hazard} can be read as a structural floor $r_t$
+plus a residual probability of a partial, nonterminal quote update.
+
+\section{Estimation and proper evaluation}
+
+Each monthly test window is forecast using parameters estimated only on prior
+calendar months. We fit $K$ on the full training panel by Gaussian
+quasi-likelihood for the unconditional variance $r_t(K)p_t(1-p_t)$. Conditional
+on this release, $\gamma$ is estimated by Bernoulli likelihood for the update
+indicator under Equation~\eqref{eq:hazard}. This two-stage procedure targets
+the identifying moments directly and avoids using the future update indicator
+as a forecast-origin regressor.
+
+The primary comparison contains five models:
+\begin{enumerate}[leftmargin=*]
+\item deadline resolution with clipped normal-reference intervals;
+\item the original active-update DR-AS fit with clipped normal-reference
+intervals;
+\item the bounded beta kernel with $q=1$, isolating distribution shape without
+a hurdle;
+\item a separately fitted update hazard with post-hoc clipping to $q\ge r$;
+\item the proposed MHB model, fitted with coherence enforced throughout.
+\end{enumerate}
+
+Prices live on a half-cent mid-quote lattice. The primary log score therefore
+uses the forecast probability of the observed half-cent cell. For MHB this cell
+probability includes both integrated beta density and the no-update atom. For a
+clipped Gaussian it includes the normal probability mapped into the cell and
+the boundary mass created by clipping. This makes the score proper on a common
+discrete observation space and avoids assigning an arbitrary density unit to
+one model but not another.
+
+We also report 50, 80, and 95 percent interval coverage, interval scores
+\citep{winkler1972decision,gneiting2007strictly}, update-hazard Brier scores,
+randomized probability integral transforms, and both equal- and volume-weighted
+aggregates. Contract-cluster resampling preserves within-contract dependence.
+All preprocessing thresholds and subgroup analyses are fixed before the full
+test outcomes are evaluated.
+
+\section{Public-API replication design}
+
+The independent replication uses Kalshi's unauthenticated historical market
+and candlestick endpoints. Hourly candlesticks contain closing YES bid and ask,
+last price, volume, and open interest. The forecast price is the closing
+mid-quote. Only consecutive observations exactly one hour apart are retained.
+The scheduled expected-expiration field defines time to resolution; realized
+settlement timing is never used as a forecast-origin feature.
+
+The frozen panel spans August 2021 through April 2026 and includes prespecified
+series from Economics, Climate and Weather, Politics, and Sports. Markets must
+have at least 48 scheduled hours and at least 100 contracts of total volume. The
+main quote-quality rule requires a closing spread no wider than 20 cents;
+thresholds of 5, 10, 50, and 100 cents are sensitivity checks. Raw JSON is
+cached, every artifact is hashed, and failed requests are recorded in the run
+manifest.
+
+This panel is an independent replication, not a claim of row-level identity
+with \citet{xi2026volatility}. Historical API aggregation, market metadata
+updates, and quote cleaning may differ from the authors' construction. The
+original headline ordering is treated as a reproduction target, but any
+difference is reported rather than silently tuned away.
+
+\section{Results}
+
+\IfFileExists{generated/results.tex}{\input{generated/results.tex}}{
+\begin{center}
+\fbox{\parbox{0.88\linewidth}{\textbf{Locked-results placeholder.}
+The full expanding-window run, cluster bootstrap, multi-level calibration, and
+spread-threshold sensitivity analysis must finish before empirical claims are
+inserted. The one-month smoke test is excluded from the manuscript evidence.}}
+\end{center}
+}
+
+\section{Limitations and interpretation}
+
+First, the displayed quote is not the frictionless efficient price. Exact
+staleness can reflect no information, thin liquidity, exchange closure, or a
+latent move smaller than one tick. The rounding-aware score addresses the price
+lattice but does not identify these mechanisms separately.
+
+Second, the active beta law is a compact forecasting kernel rather than an exact
+transition density. It is useful because it is bounded, asymmetric, and moment
+coherent. Applications that require exact absorption probabilities should use a
+Wright-Fisher spectral or high-accuracy approximate transition and retain the
+same coherence law.
+
+Third, a known resolution deadline is not the same as a known information
+event. Sports games, court decisions, and macro announcements concentrate
+information at scheduled or state-dependent times. The current hazard absorbs
+some of that predictability through time, activity, and lagged updates, but a
+calendar of scheduled events is the natural next covariate set.
+
+Finally, market prices equal risk-neutral rather than necessarily physical
+probabilities. The martingale result is a pricing-measure statement. Risk
+premia, fees, position limits, and manipulation can create predictable physical
+drift even if discounted prices are martingales under a selected measure.
+
+\section{Conclusion}
+
+In a bounded prediction market, ``whether a price moves'' and ``how volatile it
+is'' are not separable modeling choices. The martingale and binary-payoff
+structure imposes the sharp inequality $r\le q$. Enforcing that law turns the
+DR-AS variance insight into an unconditional predictive distribution with a
+no-change atom, bounded support, and proper density forecasts. Whether the added
+structure improves out-of-sample performance is an empirical question; this
+repository is designed so that the answer can be negative without compromising
+the reproducibility of the test.
+
+\begin{thebibliography}{99}
+
+\bibitem[Archak and Ipeirotis(2010)]{archak2010modeling}
+N. Archak and P. G. Ipeirotis.
+Modeling volatility in prediction markets.
+In \emph{Proceedings of the ACM Conference on Electronic Commerce}, pages 197--206, 2010.
+
+\bibitem[Catania et al.(2019)]{catania2019dynamic}
+L. Catania, R. Di Mari, and P. Santucci de Magistris.
+Dynamic discrete mixtures for high frequency prices.
+SSRN working paper 3349118, 2019.
+
+\bibitem[Dalen(2025)]{dalen2025toward}
+S. Dalen.
+Toward Black-Scholes for prediction markets: A unified kernel and market-maker's handbook.
+arXiv:2510.15205, 2025.
+
+\bibitem[Gneiting and Raftery(2007)]{gneiting2007strictly}
+T. Gneiting and A. E. Raftery.
+Strictly proper scoring rules, prediction, and estimation.
+\emph{Journal of the American Statistical Association}, 102(477):359--378, 2007.
+
+\bibitem[Hol\'y(2023)]{holy2023intraday}
+V. Hol\'y.
+An intraday GARCH model for discrete price changes and irregularly spaced observations.
+arXiv:2211.12376, 2023.
+
+\bibitem[Roa et al.(2022)]{roa2022smalltime}
+T. Roa, M. I. Fariello, G. Mart\'inez, and J. Le\'on.
+Small-time approximation of the transition density for diffusions with singularities: Application to the Wright-Fisher model.
+arXiv:2212.11442, 2022.
+
+\bibitem[Winkler(1972)]{winkler1972decision}
+R. L. Winkler.
+A decision-theoretic approach to interval estimation.
+\emph{Journal of the American Statistical Association}, 67(337):187--191, 1972.
+
+\bibitem[Xi et al.(2026)]{xi2026volatility}
+W. Xi, C. C. Moallemi, M. Pai, and S. Wang.
+Volatility in prediction markets: A structural approach.
+arXiv:2607.08199v2, 2026.
+
+\bibitem[Xu(2026)]{xu2026local}
+L. Xu.
+A local-volatility theory of prediction markets: Absorbed martingales on the simplex and an identification law for transient mispricing.
+SSRN working paper 7012278, 2026.
+
+\end{thebibliography}
+
+\end{document}
+

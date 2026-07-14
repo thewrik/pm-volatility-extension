@@ -1,0 +1,10 @@
+{
+  "panel": "data/processed/smoke_panel.csv.gz",
+  "max_spread": 0.2,
+  "min_training_rows": 1000,
+  "tick_size": 0.005,
+  "months": [
+    "2026-04"
+  ],
+  "test_predictions": 7262
+}

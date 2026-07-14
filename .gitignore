@@ -1,0 +1,26 @@
+.DS_Store
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Reproducible but potentially large data artifacts
+data/raw/
+data/processed/*.csv
+data/processed/*.csv.gz
+data/processed/*.parquet
+data/cache/
+
+# Generated empirical outputs (small final tables/figures are force-added)
+results/tmp/
+paper/build/
+paper/*.aux
+paper/*.bbl
+paper/*.blg
+paper/*.fdb_latexmk
+paper/*.fls
+paper/*.log
+paper/*.out
+

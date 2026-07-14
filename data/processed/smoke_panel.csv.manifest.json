@@ -1,0 +1,226 @@
+{
+  "active_updates": 5034,
+  "api_root": "https://external-api.kalshi.com/trade-api/v2",
+  "cache_files": [
+    {
+      "path": "data/raw/candlesticks/KXCPIYOY/KXCPIYOY-26APR-T2.6/1772809200-1777593599-60.json.gz",
+      "sha256": "4394a661d0f600f09471a3976b749d584afc7db70a338e6abc296b5bd4546949"
+    },
+    {
+      "path": "data/raw/candlesticks/KXCPIYOY/KXCPIYOY-26APR-T2.8/1772809200-1777593599-60.json.gz",
+      "sha256": "9b1e78c86fe8b1720bdaa5a731ea465eebc23ac65c65e4bdd688639ca284ff13"
+    },
+    {
+      "path": "data/raw/candlesticks/KXCPIYOY/KXCPIYOY-26APR-T2.9/1772809200-1777593599-60.json.gz",
+      "sha256": "ae05ea8748280f5f4b925500c469500607fc78089c49bede9c73b11b11033c18"
+    },
+    {
+      "path": "data/raw/candlesticks/KXCPIYOY/KXCPIYOY-26APR-T3.0/1772809200-1777593599-60.json.gz",
+      "sha256": "741bd725a32e0439c6e4000d5872e765843208ca5fda4c67ec373ab70bdf3b12"
+    },
+    {
+      "path": "data/raw/candlesticks/KXCPIYOY/KXCPIYOY-26APR-T3.1/1772809200-1777593599-60.json.gz",
+      "sha256": "98174de674668ba9150a98d0cba7eb794ceefe9e7708613991559731e7f3e524"
+    },
+    {
+      "path": "data/raw/candlesticks/KXCPIYOY/KXCPIYOY-26APR-T3.2/1772809200-1777593599-60.json.gz",
+      "sha256": "eccc4ebf24c52ade87dfe63b6b8464e339e9009a7a160265f8e278913a032d61"
+    },
+    {
+      "path": "data/raw/candlesticks/KXCPIYOY/KXCPIYOY-26APR-T3.3/1773601200-1777593599-60.json.gz",
+      "sha256": "5840a369bb855306a87eefd7c35f8a07624aca0ae49d9261ad87c508472883c3"
+    },
+    {
+      "path": "data/raw/candlesticks/KXCPIYOY/KXCPIYOY-26APR-T3.4/1773601200-1777593599-60.json.gz",
+      "sha256": "c40dc2a712d7d958a9362a7ec57b57b183120a60cde76dd28719d6bd80b354ee"
+    },
+    {
+      "path": "data/raw/candlesticks/KXCPIYOY/KXCPIYOY-26APR-T3.5/1773601200-1777593599-60.json.gz",
+      "sha256": "66b03c6b423026fe0761262734ec75432040c740a0c48a2f57fd285a34068c4c"
+    },
+    {
+      "path": "data/raw/candlesticks/KXCPIYOY/KXCPIYOY-26APR-T3.6/1773601200-1777593599-60.json.gz",
+      "sha256": "d5824e80d0b30ac0e0c3aa98b227f2ad7ee5a63b105cfdd90aaf006af559d494"
+    },
+    {
+      "path": "data/raw/candlesticks/KXCPIYOY/KXCPIYOY-26APR-T3.7/1773601200-1777593599-60.json.gz",
+      "sha256": "f92ba094577cf240d6b4f3311f9cf1cc098f208c83f6dc3229ce892eaff1c807"
+    },
+    {
+      "path": "data/raw/candlesticks/KXCPIYOY/KXCPIYOY-26APR-T3.8/1773601200-1777593599-60.json.gz",
+      "sha256": "3273187794a03e893e30101931e0d059536e55c5888b1e389041e4eaa7d70849"
+    },
+    {
+      "path": "data/raw/candlesticks/KXCPIYOY/KXCPIYOY-26APR-T3.9/1773601200-1777593599-60.json.gz",
+      "sha256": "252bc640fb3b861949beb379782abc753d463e40bd03d1763983141f11515cb1"
+    },
+    {
+      "path": "data/raw/candlesticks/KXCPIYOY/KXCPIYOY-26APR-T4.0/1773601200-1777593599-60.json.gz",
+      "sha256": "bb7d884ee94b3337163fa2d924d8645834bac70ee543a0f6fa5397851ad76a3b"
+    },
+    {
+      "path": "data/raw/candlesticks/KXCPIYOY/KXCPIYOY-26APR-T4.1/1775667600-1777593599-60.json.gz",
+      "sha256": "1c5a41ac68c2e119346affcfb42defc2c73eeef597f531a9952f86158786f908"
+    },
+    {
+      "path": "data/raw/candlesticks/KXCPIYOY/KXCPIYOY-26APR-T4.2/1775667600-1777593599-60.json.gz",
+      "sha256": "0f693da4c4ac39328f9a60d5e1f90d1636b8ae317bc9b56a1fe462f53bf1922c"
+    },
+    {
+      "path": "data/raw/candlesticks/KXCPIYOY/KXCPIYOY-26APR-T4.3/1775667600-1777593599-60.json.gz",
+      "sha256": "49dfae27244ee331b5f5d70dd2c42f144d88aed705680192236b3c8e4adbf9ff"
+    },
+    {
+      "path": "data/raw/candlesticks/KXCPIYOY/KXCPIYOY-26APR-T4.4/1775667600-1777593599-60.json.gz",
+      "sha256": "253221c881168d687876259370a604590deb1082ab14e577e7a6efab8e577d0d"
+    },
+    {
+      "path": "data/raw/candlesticks/KXCPIYOY/KXCPIYOY-26MAR-T3.5/1773154800-1775826023-60.json.gz",
+      "sha256": "2e17fd9e2103a826ef412c1a588e8c3729b4e0d4042bba65794ce86ff48fb7e3"
+    },
+    {
+      "path": "data/raw/candlesticks/KXCPIYOY/KXCPIYOY-26MAR-T3.6/1773154800-1775826023-60.json.gz",
+      "sha256": "135cc91bb3516e5701cf3c6b7939da7ab2504d4b8bc885d845732e60a8e03ad8"
+    },
+    {
+      "path": "data/raw/candlesticks/KXCPIYOY/KXCPIYOY-26MAR-T3.7/1773154800-1775826023-60.json.gz",
+      "sha256": "c4a692f170140b5c047f8fed328781b347448292e03059887199b6362e8a3fd4"
+    },
+    {
+      "path": "data/raw/candlesticks/KXCPIYOY/KXCPIYOY-26MAR-T3.8/1773154800-1775826023-60.json.gz",
+      "sha256": "6893cb7f4c59035fb3f463d80978c894b78432b3ae00e4d987917a7071c69448"
+    },
+    {
+      "path": "data/raw/candlesticks/KXCPIYOY/KXCPIYOY-26MAR-T3.9/1773154800-1775826023-60.json.gz",
+      "sha256": "055103b79c1a6c125b031dd11e00a58aec0eedbcf52de942bdabb2e8be76b8ec"
+    },
+    {
+      "path": "data/raw/candlesticks/KXCPIYOY/KXCPIYOY-26MAR-T4.0/1773154800-1775826023-60.json.gz",
+      "sha256": "40491cd117c156365f6bfde7ceb9f0d0f3c7b7dd56ff01baa2cf09cf651a0a0a"
+    },
+    {
+      "path": "data/raw/candlesticks/KXHIGHNY/KXHIGHNY-26APR28-B59.5/1777298400-1777438740-60.json.gz",
+      "sha256": "62d9f50418ab9c05a017d3fc8930dfc153cbfcd2cedff646129cc6dcd390b5bc"
+    },
+    {
+      "path": "data/raw/candlesticks/KXHIGHNY/KXHIGHNY-26APR28-B61.5/1777298400-1777438740-60.json.gz",
+      "sha256": "5942df6258e5ff6d4b684903a34718462fce6f9571de0ccd1e0ebeef5b8624f8"
+    },
+    {
+      "path": "data/raw/candlesticks/KXHIGHNY/KXHIGHNY-26APR28-B63.5/1777298400-1777438740-60.json.gz",
+      "sha256": "1d9042ff51b3032d5e00decd981ff62a186f2f1b1522cdfdbfa5b78feda99cd5"
+    },
+    {
+      "path": "data/raw/candlesticks/KXHIGHNY/KXHIGHNY-26APR28-B65.5/1777298400-1777438740-60.json.gz",
+      "sha256": "d66e2fb2cfac2059687b57334871a3457087de05833bb0b625fa82e54cb32fab"
+    },
+    {
+      "path": "data/raw/candlesticks/KXHIGHNY/KXHIGHNY-26APR28-T59/1777298400-1777438740-60.json.gz",
+      "sha256": "953beb29b6fdc4aeb770bbda492bc7b911f88306f31270971b4615da06b10f5f"
+    },
+    {
+      "path": "data/raw/candlesticks/KXHIGHNY/KXHIGHNY-26APR28-T66/1777298400-1777438740-60.json.gz",
+      "sha256": "175cf1ee29cb1ca17f2169f146a69328e16d3fcc4409001093a15d27567d3bc3"
+    },
+    {
+      "path": "data/raw/candlesticks/KXHIGHNY/KXHIGHNY-26APR29-B56.5/1777384800-1777525140-60.json.gz",
+      "sha256": "1e848d0ff99bf2dc682bc8062de577dfe4116bd9107338326817b38588ca6dcd"
+    },
+    {
+      "path": "data/raw/candlesticks/KXHIGHNY/KXHIGHNY-26APR29-B58.5/1777384800-1777525140-60.json.gz",
+      "sha256": "dcff6d73a97114e33309e7ed10608d48abcabbb2c97471466f6cee2cdd35ca25"
+    },
+    {
+      "path": "data/raw/candlesticks/KXHIGHNY/KXHIGHNY-26APR29-B60.5/1777384800-1777525140-60.json.gz",
+      "sha256": "046e2da44b31ad8e1251ed03d02607bea65c75ae1aeadd2fab94aae4dc69bd0d"
+    },
+    {
+      "path": "data/raw/candlesticks/KXHIGHNY/KXHIGHNY-26APR29-B62.5/1777384800-1777525140-60.json.gz",
+      "sha256": "e9199df2df708ac79ac5bd8b47a8384a18336502db95e68a1c758b99958781d0"
+    },
+    {
+      "path": "data/raw/candlesticks/KXHIGHNY/KXHIGHNY-26APR29-T56/1777384800-1777525140-60.json.gz",
+      "sha256": "589c50232cf39378a33519ff0386f04297f269c8eaca251d874ee7c2ac949960"
+    },
+    {
+      "path": "data/raw/candlesticks/KXHIGHNY/KXHIGHNY-26APR29-T63/1777384800-1777525140-60.json.gz",
+      "sha256": "944ac374b4d2978f642d8dec6ae4eced61c0cd2f11e5817d1fd9db32104a3b6a"
+    },
+    {
+      "path": "data/raw/candlesticks/KXHIGHNY/KXHIGHNY-26APR30-B61.5/1777471200-1777593599-60.json.gz",
+      "sha256": "72a5b3cc64e1141067d8dba59c8eccd27e452cbc2821b153af71923abd515582"
+    },
+    {
+      "path": "data/raw/candlesticks/KXHIGHNY/KXHIGHNY-26APR30-B63.5/1777471200-1777593599-60.json.gz",
+      "sha256": "9edd42a53c8618db9469145f66f7ce42cfeb1ad15d28e082d58337e9038ca244"
+    },
+    {
+      "path": "data/raw/candlesticks/KXHIGHNY/KXHIGHNY-26APR30-B65.5/1777471200-1777593599-60.json.gz",
+      "sha256": "0d55a6d19e41180afc839b3bff5460963f9194bea05a2988d533867bd74a837a"
+    },
+    {
+      "path": "data/raw/candlesticks/KXHIGHNY/KXHIGHNY-26APR30-B67.5/1777471200-1777593599-60.json.gz",
+      "sha256": "4550726a2c53bde0f662d62f80e7a43dfd7eace8f3e8b7d7951ad9679f8280f4"
+    },
+    {
+      "path": "data/raw/candlesticks/KXHIGHNY/KXHIGHNY-26APR30-T61/1777471200-1777593599-60.json.gz",
+      "sha256": "8bc6f6eb33c72eec92ac0b644c6134fe5db65ace855280d207e6189edc365ab9"
+    },
+    {
+      "path": "data/raw/candlesticks/KXHIGHNY/KXHIGHNY-26APR30-T68/1777471200-1777593599-60.json.gz",
+      "sha256": "90253f39054e3dcd81d5fc97589a33535aa64ee2c6b81e9736f8ccb3019320c0"
+    },
+    {
+      "path": "data/raw/candlesticks/KXHIGHNY/KXHIGHNY-26MAY01-B62.5/1777557600-1777593599-60.json.gz",
+      "sha256": "dfbbf5268e6140324f2632aa0f374d82a1e249526e8d7b365a155e18c920c80e"
+    },
+    {
+      "path": "data/raw/candlesticks/KXHIGHNY/KXHIGHNY-26MAY01-B64.5/1777557600-1777593599-60.json.gz",
+      "sha256": "a0d2627fa97d4eec401c86955269b40caf21f154d1b6da417efda19335705591"
+    },
+    {
+      "path": "data/raw/candlesticks/KXHIGHNY/KXHIGHNY-26MAY01-B66.5/1777557600-1777593599-60.json.gz",
+      "sha256": "0043cacd87b04b202e6076a0aba1464f86db215a6ff500942736df9c98fd8e7a"
+    },
+    {
+      "path": "data/raw/candlesticks/KXHIGHNY/KXHIGHNY-26MAY01-B68.5/1777557600-1777593599-60.json.gz",
+      "sha256": "ca985ba2ed719c51dfef18fa3e54833024af220ca8aaae4eae77678dbf96546b"
+    },
+    {
+      "path": "data/raw/candlesticks/KXHIGHNY/KXHIGHNY-26MAY01-T62/1777557600-1777593599-60.json.gz",
+      "sha256": "eab3ed0331599812b21a2f8e8c7a26980cc32a881ae126778cc866cc10fb1ef4"
+    },
+    {
+      "path": "data/raw/candlesticks/KXHIGHNY/KXHIGHNY-26MAY01-T69/1777557600-1777593599-60.json.gz",
+      "sha256": "663c1dda83d513e8aee5638cf5c1d22669b4e18a319acf0d9d1fe3394f894d8a"
+    }
+  ],
+  "config": {
+    "description": "Fast end-to-end validation panel; not for headline claims",
+    "end": "2026-04-30T23:59:59Z",
+    "max_markets_per_series": 24,
+    "minimum_market_lifetime_hours": 48,
+    "minimum_market_volume": 1000,
+    "period_minutes": 60,
+    "series": [
+      {
+        "category": "Economics",
+        "ticker": "KXCPIYOY"
+      },
+      {
+        "category": "Climate and Weather",
+        "ticker": "KXHIGHNY"
+      }
+    ],
+    "start": "2025-01-01T00:00:00Z"
+  },
+  "config_sha256": "b5c3904d580578a486bb5ded82dbc9025667880be0680a802e1ec3be10390d8b",
+  "created_at": "2026-07-14T16:37:43.225022Z",
+  "failures": [],
+  "markets_selected": 48,
+  "markets_succeeded": 48,
+  "output": "data/processed/smoke_panel.csv.gz",
+  "output_sha256": "aac17e19ff5b891d19e8486200be25fc0b84207fdd84b326c9f7f8932631271a",
+  "rows": 14494,
+  "valid_forecasts": 11965
+}

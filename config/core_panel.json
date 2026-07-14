@@ -1,0 +1,24 @@
+{
+  "description": "Frozen multi-category panel selected before outcome evaluation",
+  "start": "2021-08-01T00:00:00Z",
+  "end": "2026-04-30T23:59:59Z",
+  "period_minutes": 60,
+  "minimum_market_lifetime_hours": 48,
+  "minimum_market_volume": 100,
+  "max_markets_per_series": 1000,
+  "market_sampling": "time_stratified",
+  "series": [
+    {"ticker": "KXCPIYOY", "category": "Economics"},
+    {"ticker": "KXCPI", "category": "Economics"},
+    {"ticker": "KXFED", "category": "Economics"},
+    {"ticker": "KXPAYROLLS", "category": "Economics"},
+    {"ticker": "KXGDP", "category": "Economics"},
+    {"ticker": "KXU3", "category": "Economics"},
+    {"ticker": "KXHIGHNY", "category": "Climate and Weather"},
+    {"ticker": "KXHIGHLAX", "category": "Climate and Weather"},
+    {"ticker": "PRES", "category": "Politics"},
+    {"ticker": "KXGOVSHUT", "category": "Politics"},
+    {"ticker": "KXMARMAD", "category": "Sports"},
+    {"ticker": "KXMENWORLDCUP", "category": "Sports"}
+  ]
+}

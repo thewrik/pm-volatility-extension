@@ -1,0 +1,14 @@
+{
+  "description": "Fast end-to-end validation panel; not for headline claims",
+  "start": "2025-01-01T00:00:00Z",
+  "end": "2026-04-30T23:59:59Z",
+  "period_minutes": 60,
+  "minimum_market_lifetime_hours": 48,
+  "minimum_market_volume": 1000,
+  "max_markets_per_series": 24,
+  "market_sampling": "recent",
+  "series": [
+    {"ticker": "KXCPIYOY", "category": "Economics"},
+    {"ticker": "KXHIGHNY", "category": "Climate and Weather"}
+  ]
+}

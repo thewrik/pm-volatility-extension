@@ -1,0 +1,4 @@
+[console_scripts]
+pmv-backtest = pmvol.backtest:main
+pmv-download = pmvol.data:main
+pmv-simulate = pmvol.simulation:main
